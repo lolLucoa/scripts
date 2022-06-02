@@ -2,7 +2,8 @@ repeat
     wait()
 until game:IsLoaded()
 getgenv().SkipStratMaintance = true
-print("Auto strat old version, evaluation copy 1.0")
+print("Auto strat old version, evaluation copy 1.0 by MintTea#9260")
+print("Built-in auto exec isn't working, please manually put it into autoexec")
 wait()
 local P = {}
 if not getgenv().ExecutedAlr then
