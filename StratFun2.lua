@@ -16,7 +16,8 @@ if not getgenv().ExecutedAlr then
     loadstring(
         game:HttpGet(
             "https://raw.githubusercontent.com/TacoCatBackWardsIsTacoCat/scripts/main/Auto%20strat%20old%20main"
-        )--Edited main file, older version of the script
+        )
+     --Edited main file, older version of the script
     )()
     loadstring(game:HttpGet("https://banbusscripts.netlify.app/Scripts/IsAutoStratMain"))()
     if getgenv().StratMaintance == true and not getgenv().SkipStratMaintance == true then
@@ -25,7 +26,7 @@ if not getgenv().ExecutedAlr then
             loadstring(game:HttpGet("https://banbusscripts.netlify.app/Scripts/IsAutoStratMain"))()
             getgenv().status = "Script in maintenance, waiting..."
             wait(1)
-        until getgenv().StratMaintance == false 
+        until getgenv().StratMaintance == false
     end
     getgenv().status = "Loading"
     getgenv().count = 0
@@ -475,42 +476,38 @@ if not getgenv().ExecutedAlr then
                                 game.Players.LocalPlayer.Character.Humanoid.PlatformStand = true
                             end
                         )
-                        spawn(function()
-                            while wait() do
-                                if b == 1 then
+                        while wait() do
+                            if b == 1 then
                                 pcall(
                                     function()
                                         h = false
                                     end
                                 )
-                                elseif b == 2 then
-                                 pcall(
+                            elseif b == 2 then
+                                pcall(
                                     function()
                                         h = false
                                         local a = game:GetService("Workspace").NPCs:GetChildren()
-                                         if #a ~= 0 then
+                                        if #a ~= 0 then
                                             for i, a in pairs(a) do
-                                                if a:WaitForChild("HumanoidRootPart",1).CFrame.Y > -5 then
+                                                if a:WaitForChild("HumanoidRootPart", 1).CFrame.Y > -5 then
                                                     N.CameraSubject = a.HumanoidRootPart
                                                     wait()
                                                     break
                                                 else
-                                                    N.CameraSubject =
-                                                        game:GetService("Workspace").Map.Paths["1"]["1"]
+                                                    N.CameraSubject = game:GetService("Workspace").Map.Paths["1"]["1"]
                                                     break
                                                 end
                                             end
-                                         else
-                                            N.CameraSubject =
-                                                game:GetService("Workspace").Map.Paths["1"]["1"]
-                                         end
+                                        else
+                                            N.CameraSubject = game:GetService("Workspace").Map.Paths["1"]["1"]
                                         end
+                                    end
                                 )
                             elseif b == 3 then
                                 h = true
                             end
-                            end
-                        )
+                        end
                     end
                 )
             end
