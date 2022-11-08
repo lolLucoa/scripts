@@ -52,7 +52,7 @@ end
 local function MedicAbi(tower)
     game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Abilities","Activate",{Troop = tower,Name = "Cleansing"})
 end
-local function tFuncs(tower,operation, arg) -- 1 - place 2 - upgrade 3 - sell 
+local function tFuncs(tower,operation, arg) -- 1 - place 2 - upgrade 3 - sell | function for micro
     if operation == 1 then --place
         local t = game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Place",tower,{Rotation = arg.Rotation,Position = arg.Position})
         return t
@@ -67,7 +67,7 @@ local function tFuncs(tower,operation, arg) -- 1 - place 2 - upgrade 3 - sell
         game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Sell",{Troop = tower})
     end
 end
-local function checkStun(tower)
+local function checkStun(tower) -- checks stuns of tower
     local stuns = tower.Replicator.Stuns
     local r = false
     for i,v in pairs(stuns:GetAttributes()) do
@@ -110,7 +110,7 @@ for i,v in pairs(game:GetService("Workspace").Towers:GetChildren()) do
             end
             v.Replicator.Stuns.Changed:Connect(function()
                 if checkStun(v) then
-                    useAb = true
+                    useAb = true --detects stuns, requests medic ability
                 end
             end)
     end
@@ -166,7 +166,7 @@ local index = 0
                 status.Text = "Waiting for stun..."
                 if index > #Medics then
                     index = 1
-                end
+                end --Index change (if there are 2 medics and u sell 1, it wont error)
             until useAb==true or (#Medics < 1) 
             wait(2)--slight delay to wait til towers are properly stunned
             if #Medics > 0 then
