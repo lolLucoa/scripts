@@ -168,7 +168,7 @@ local index = 0
                     index = 1
                 end
             until useAb==true or (#Medics < 1) 
-            wait(1)--slight delay to wait til towers are properly stunned
+            wait(2)--slight delay to wait til towers are properly stunned
             if #Medics > 0 then
                 warn("Detected stun! Using ability...")
                 MedicAbi(Medics[index])
