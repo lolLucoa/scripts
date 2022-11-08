@@ -37,8 +37,8 @@ w:Button("Delete Gui",function()
             v.Parent.Parent:Destroy()
         end
     end
-    getgenv().TowerAdded:Disconnect()
-    getgenv().TowerRemoved:Disconnect()
+    getgenv().TowerAddedM:Disconnect()
+    getgenv().TowerRemovedM:Disconnect()
     StatusTable = nil
     getgenv().AlrExecMAC = false
 end)
@@ -115,7 +115,7 @@ for i,v in pairs(game:GetService("Workspace").Towers:GetChildren()) do
             end)
     end
 end
-getgenv().TowerAdded = game:GetService("Workspace").Towers.ChildAdded:Connect(function(v)
+getgenv().TowerAddedM = game:GetService("Workspace").Towers.ChildAdded:Connect(function(v)
     wait(.25)
     if not v:FindFirstChild("Replicator") then
         repeat wait() until v:FindFirstChild("Replicator")
@@ -131,7 +131,7 @@ getgenv().TowerAdded = game:GetService("Workspace").Towers.ChildAdded:Connect(fu
             end)
     end
 end)
-getgenv().TowerRemoved = game:GetService("Workspace").Towers.ChildRemoved:Connect(function(v)
+getgenv().TowerRemovedM = game:GetService("Workspace").Towers.ChildRemoved:Connect(function(v)
     if v:FindFirstChild("Owner").Value and v:FindFirstChild("Owner").Value == game:GetService("Players").LocalPlayer.UserId and v.Replicator:GetAttribute("Type") == "Medic" then
         for i,t in next,Medics do
             if t == v then
@@ -161,7 +161,13 @@ local index = 0
                 wait(.1)
             end
             until Medics[index].Replicator:GetAttribute("Upgrade") == 5 or (#Medics < 1)
-            repeat wait(.1) status.Text = "Waiting for stun..." until useAb==true or (#Medics < 1) 
+            repeat
+                wait(.1) 
+                status.Text = "Waiting for stun..."
+                if index > #Medics then
+                    index = 1
+                end
+            until useAb==true or (#Medics < 1) 
             wait(1)--slight delay to wait til towers are properly stunned
             if #Medics > 0 then
                 warn("Detected stun! Using ability...")
