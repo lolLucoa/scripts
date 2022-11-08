@@ -20,50 +20,6 @@ elseif game.PlaceId ~= 5591597781 then
         return
 end
 getgenv().AlrExecMAC = true
-local function MedicAbi(tower)
-    game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Abilities","Activate",{Troop = tower,Name = "Cleansing"})
-end
-local function tFuncs(tower,operation, arg) -- 1 - place 2 - upgrade 3 - sell 
-    if operation == 1 then --place
-        game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Place",tower,{Rotation = arg.Rotation,Position = arg.Position})
-    elseif operation == 2 then
-        if not arg then arg = 1 end
-        for i = 1, arg do
-        game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Upgrade","Set",{Troop = tower})
-        wait(0.1)
-        end
-    elseif operation == 3 then
-        game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Sell",{Troop = tower})
-    end
-end
-local function checkStun(tower)
-    local stuns = tower.Replicator.Stuns
-    local r = false
-    for i,v in pairs(stuns:GetAttributes()) do
-        if v == true then
-            r = true
-            warn("Detected Stun!")
-        end
-    end
-    return r
-end
-local function microTower(tower,statuss)
-    if statuss then
-        status.Text = statuss
-    end
-    local frame = tower.HumanoidRootPart.CFrame
-    local tname = tower.Replicator:GetAttribute("Type")
-    local upgrade = tower.Replicator:GetAttribute("upgrade")
-    --sell tower
-    tFuncs(tower,3)
-    wait()
-    --Place tower
-    tFuncs(tname,1,frame)
-    wait()
-    --Upgrade tower
-    tFuncs(tower,2,upgrade)
-    wait()
-end
 --Constants/Variables
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/ROBLOX/main/ModificationWallyUi", true))() --Wally UI Loadstring by Thomas Andrew#8787
 local Medics = {}
@@ -92,6 +48,57 @@ for i,v in pairs(game:GetService("CoreGui"):GetDescendants()) do
         status = v
     end
 end
+--Functions
+local function MedicAbi(tower)
+    game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Abilities","Activate",{Troop = tower,Name = "Cleansing"})
+end
+local function tFuncs(tower,operation, arg) -- 1 - place 2 - upgrade 3 - sell 
+    if operation == 1 then --place
+        local t = game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Place",tower,{Rotation = arg.Rotation,Position = arg.Position})
+        return t
+    elseif operation == 2 then
+        if arg == nil then arg = 1 warn("No Level Provided!") end
+        warn("Attempting to upgrade medic to level ",arg)
+        for i = 1, arg do
+        game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Upgrade","Set",{Troop = tower})
+        wait(0.1)
+        end
+    elseif operation == 3 then
+        game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Sell",{Troop = tower})
+    end
+end
+local function checkStun(tower)
+    local stuns = tower.Replicator.Stuns
+    local r = false
+    for i,v in pairs(stuns:GetAttributes()) do
+        if v == true then
+            r = true
+            warn("Detected Stun!")
+        end
+    end
+    return r
+end
+local function microTower(tower,statuss)
+    if statuss then
+        status.Text = statuss
+    end
+    local frame = tower.HumanoidRootPart.CFrame
+    local tname = tower.Replicator:GetAttribute("Type")
+    local upgrade = tower.Replicator:GetAttribute("Upgrade")
+    --sell tower
+    warn("[Debug] Selling tower...")
+    tFuncs(tower,3)
+    wait()
+    --Place tower
+    tower = tFuncs(tname,1,frame)
+    warn("[Debug] Placing Tower...")
+    wait()
+    --Upgrade tower
+    tFuncs(tower,2,upgrade)
+    warn("[Debug] Upgraded tower!")
+    wait()
+end
+--Detects medic
 for i,v in pairs(game:GetService("Workspace").Towers:GetChildren()) do
     if v:FindFirstChild("Owner").Value and v:FindFirstChild("Owner"). Value == game:GetService("Players").LocalPlayer.UserId and v.Replicator:GetAttribute("Type") == "Medic" then
             table.insert(Medics,v)
@@ -125,10 +132,11 @@ getgenv().TowerAdded = game:GetService("Workspace").Towers.ChildAdded:Connect(fu
     end
 end)
 getgenv().TowerRemoved = game:GetService("Workspace").Towers.ChildRemoved:Connect(function(v)
-    if v:FindFirstChild("Owner").Value and v:FindFirstChild("Owner").Value == game:GetService("Players").LocalPlayer.UserId and v.Replicator:GetAttribute("Type") == "Commander" then
+    if v:FindFirstChild("Owner").Value and v:FindFirstChild("Owner").Value == game:GetService("Players").LocalPlayer.UserId and v.Replicator:GetAttribute("Type") == "Medic" then
         for i,t in next,Medics do
             if t == v then
                 table.remove(Medics,i)
+                status.Text = "Medic Removed!"
             end
         end
     end
@@ -146,17 +154,21 @@ local index = 0
             repeat 
             if Medics[index].Replicator:GetAttribute("Upgrade") < 5 then
                 index = index + 1
+                if index > #Medics then
+                    index = 1
+                end
                 status.Text = "Waiting for max medic..."
                 wait(.1)
             end
-            until Medics[index].Replicator:GetAttribute("Upgrade") == 5
-            repeat wait(1) status.Text = "Waiting for stun..." until useAb==true or (#Medics < 1) --slight delay to wait til towers are properly stunned
-            warn("Attempting to use ability...")
+            until Medics[index].Replicator:GetAttribute("Upgrade") == 5 or (#Medics < 1)
+            repeat wait(.1) status.Text = "Waiting for stun..." until useAb==true or (#Medics < 1) 
+            wait(1)--slight delay to wait til towers are properly stunned
             if #Medics > 0 then
                 warn("Detected stun! Using ability...")
                 MedicAbi(Medics[index])
                 status.Text = "Activated Medic Ability"
                 if microing then
+                    warn("[Debug] Microing medic...")
                     microTower(Medics[index], "Microing Medic...")
                 end
             end
