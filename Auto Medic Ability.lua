@@ -1,39 +1,191 @@
---Credits to Thomas Andrew#8787 for some of the core functions, such as troop detection
---[[
-    TODO - Add distance check to medic (stunned tower in range)
-]] 
-local suc, err = pcall(function()
+--[[Rewrote the entire auto medic because it was messy
+- More features, such as min. towers stunned
+- A LOT more optimization, should produce 0 lag
+- Not adding distance checks because it's 
+Credits to 
+Gal. Sigmanic#6607 for some functions, such as troop detection
+Made my MintTea#9260
+]]
+local suc,err = pcall(function()
+--Defining Variables
+local RS, TW, RF, LPSR = game:GetService("ReplicatedStorage"), workspace:WaitForChild("Towers"), game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"), nil
+local Medics, MedicIndex, MedicAbility, MedicMicro, StunnedCount, status, library = {}, 0, false, false, 0, nil,loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/ROBLOX/main/ModificationWallyUi", true))()
+local AbilityDelay = 2 --Change to 1.5, or 1. Whichever works best for you :)
+local Debug = true
+local TowersStunnedBeforeAbility = 5 --Default option. Can be changed in the GUI
 --Functions
+local function prints(v)
+    if Debug then
+        warn(v)
+    end
+end
+local function microTower(tower,statuss)
+    if statuss then
+        status.Text = statuss
+    end
+    local frame = tower.HumanoidRootPart.CFrame
+    local tname = tower.Replicator:GetAttribute("Type")
+    local upgrade = tower.Replicator:GetAttribute("Upgrade")
+    --Sell tower
+    RF:InvokeServer("Troops","Sell",{Troop = tower})
+    --Place tower
+    tower = RF:InvokeServer("Troops","Place",tname,{Rotation = frame.Rotation,Position = frame.Position})
+    --Upgrade tower
+    for i = 1, upgrade do
+        RF:InvokeServer("Troops","Upgrade","Set",{Troop = tower})
+    end
+    prints("Microed tower!")
+    return towerMedics
+end
+
+local function checkStun(tower) -- checks stuns of tower
+    local stuns = tower.Replicator.Stuns
+    for i,v in pairs(stuns:GetAttributes()) do
+        if v == true then
+            prints("Detected Stun!")
+            return true
+        end
+    end
+    return false
+end
+local function refreshStun(medic)
+    local st = 0
+    for i,v in pairs(workspace.Towers:GetChildren()) do
+        if (medic.HumanoidRootPart.Position-v.HumanoidRootPart.Position).Magnitude <= medic.Replicator:GetAttribute("Range") and checkStun(v) then
+            st = st + 1
+        end
+    end
+    return st
+end
+local function Medic()
+    if #Medics < 1 then
+        return "Waiting for Medic..."
+    end
+    MedicIndex = (MedicIndex % #Medics) + 1
+    local selectedMedic = Medics[MedicIndex]
+    if selectedMedic.Replicator:GetAttribute("Upgrade") < 5 then
+        return "Waiting for lvl 5 medic..."
+    elseif StunnedCount < 1 then
+        return "Waiting for stun..."
+    end
+        -- Use Ability
+    if MedicAbility then
+        wait(AbilityDelay)
+        if #Medics < 1 then return "You sold your medic ._." end
+        if not selectedMedic then
+            MedicIndex = (MedicIndex % #Medics) + 1
+            selectedMedic = Medics[MedicIndex]  
+        end
+        StunnedCount = refreshStun(selectedMedic)
+        MedicIndex = MedicIndex + 1
+        if selectedMedic.Replicator:GetAttribute("Upgrade") < 5 then
+            return "Waiting for lvl 5 medic..."
+        elseif StunnedCount < 1 then
+            return "Waiting for stun..."
+        end
+        local Re = RF:InvokeServer("Troops","Abilities","Activate",{Troop = selectedMedic,Name = "Cleansing"})
+        if not Re then --Ability on cooldown, micro medic
+            if MedicMicro then
+                if selectedMedic.Replicator:GetAttribute("Worth") > LPSR:GetAttribute("Cash") then return "You can't afford to Micro! Waiting..." end
+                selectedMedic = microTower(selectedMedic)
+                RF:InvokeServer("Troops","Abilities","Activate",{Troop = selectedMedic,Name = "Cleansing"})       
+                StunnedCount = refreshStun(selectedMedic)
+                return "Successfully Microed Medic!"
+            else
+                return "Ability on cooldown... Waiting..."
+            end
+        else
+            StunnedCount = refreshStun(selectedMedic)
+            return "Successfully used Ability!"
+        end
+    else
+        return "Medic Ability Not turned on!"
+    end
+    return "An error occured..."
+end
+
+local function monitorTower(tower)
+    if tower:FindFirstChild("Owner").Value and tower:FindFirstChild("Owner").Value == game:GetService("Players").LocalPlayer.UserId and tower.Replicator:GetAttribute("Type") == "Medic" then
+        table.insert(Medics,tower)
+        prints("Medic found! Adding to list...")
+        status.Text = Medic()
+        if tower.Replicator:GetAttribute("Upgrade") < 5 then
+            local Temp = nil
+            Temp = tower.Replicator:GetAttributeChangedSignal("Upgrade"):Connect(function()
+                if tower.Parent == nil then
+                    Temp:Disconnect()
+                    return
+                end
+                if tower.Replicator:GetAttribute("Upgrade") == 5 then
+                    prints("Medic maxed!")
+                    status.Text = Medic()
+                    Temp:Disconnect()
+                end
+            end)
+        end
+    else   
+        prints("Found tower that isn't medic! Monitoring for stun...") 
+        if checkStun(tower) then
+            StunnedCount = StunnedCount + 1
+            if StunnedCount >= TowersStunnedBeforeAbility then
+                status.Text = Medic()
+                prints("Stunned count reached! using abi...")
+            end
+        end
+        tower.Replicator.Stuns.Changed:Connect(function()
+            if checkStun(tower) then
+                StunnedCount = StunnedCount + 1 --detects stuns, requests medic ability
+                if StunnedCount >= TowersStunnedBeforeAbility then
+                    status.Text = Medic()
+                    prints("Stunned count reached! using abi...")
+                end
+            end
+        end)
+    end
+end
+
+--Initialization
+if not game:IsLoaded() then game.Loaded:Wait() end
 if getgenv().AlrExecMAC then
 	game.StarterGui:SetCore("SendNotification", {
-	Title = "Auto Medic",
-	Text = "Script Already Executed.";
-	Duration = 6;
+        Title = "Auto Medic V2",
+        Text = "Script Already Executed.";
+        Duration = 6;
 	})
 	return
 elseif game.PlaceId ~= 5591597781 then
     game.StarterGui:SetCore("SendNotification", {
-        Title = "Auto Medic",
+        Title = "Auto Medic V2",
         Text = "Not in game! Killing script...";
         Duration = 6;
-        })
-        return
+    })
+    return
+else
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Auto Medic V2",
+        Text = "Script Executed! Enjoy :)";
+        Duration = 6;
+    })
 end
 getgenv().AlrExecMAC = true
---Constants/Variables
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/ROBLOX/main/ModificationWallyUi", true))() --Wally UI Loadstring by Thomas Andrew#8787
-local Medics = {}
-local enabled = false
-local microing = false
-local useAb = false
-local status
---Medic chain function
-local w = library:CreateWindow("Auto Medic Ability")
-w:Toggle("Auto Medic Abilities", {flag='enabled'}, function() enabled = w.flags.enabled end)
-w:Toggle("Auto Micro Medics", {flag='microing'}, function() microing = w.flags.microing end)
+for i,v in pairs(RS.StateReplicators:GetChildren()) do
+    if v:GetAttribute("UserId") and v:GetAttribute("UserId") == game.Players.LocalPlayer.UserId then
+        LPSR = v
+    end
+end
+--Main Script 
+local w = library:CreateWindow("Auto Medic Ability V2")
+w:Toggle("Auto Medic Abilities", {flag='enabled'}, function() MedicAbility = w.flags.enabled end)
+w:Toggle("Auto Micro Medics", {flag='microing'}, function() MedicMicro = w.flags.microing end)
+w:Slider("Min. Stuns",{min = 1, max = 20, default=5, pricise = true, flag = w.flags.mintower},function(value)
+    value = tonumber(value)
+    if not value then value = 1 end
+    TowersStunnedBeforeAbility = value
+end)
 w:Button("Delete Gui",function()
+    --w:DestroyGui() --Can't be used due to the latest UI loadstring being obfuscated and MM isn't gonna be happy
     for i,v in pairs(game:GetService("CoreGui"):GetDescendants()) do
-        if v:IsA("Frame") and v.Name == "Auto Medic Ability" then
+        if v:IsA("Frame") and v.Name == "Auto Medic Ability V2" then
             v.Parent.Parent:Destroy()
         end
     end
@@ -48,142 +200,33 @@ for i,v in pairs(game:GetService("CoreGui"):GetDescendants()) do
         status = v
     end
 end
---Functions
-local function MedicAbi(tower)
-    game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Abilities","Activate",{Troop = tower,Name = "Cleansing"})
-end
-local function tFuncs(tower,operation, arg) -- 1 - place 2 - upgrade 3 - sell | function for micro
-    if operation == 1 then --place
-        local t = game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Place",tower,{Rotation = arg.Rotation,Position = arg.Position})
-        return t
-    elseif operation == 2 then
-        if arg == nil then arg = 1 warn("No Level Provided!") end
-        warn("Attempting to upgrade medic to level ",arg)
-        for i = 1, arg do
-        game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Upgrade","Set",{Troop = tower})
-        wait(0.1)
-        end
-    elseif operation == 3 then
-        game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops","Sell",{Troop = tower})
-    end
-end
-local function checkStun(tower) -- checks stuns of tower
-    local stuns = tower.Replicator.Stuns
-    local r = false
-    for i,v in pairs(stuns:GetAttributes()) do
-        if v == true then
-            r = true
-            warn("Detected Stun!")
-        end
-    end
-    return r
-end
-local function microTower(tower,statuss)
-    if statuss then
-        status.Text = statuss
-    end
-    local frame = tower.HumanoidRootPart.CFrame
-    local tname = tower.Replicator:GetAttribute("Type")
-    local upgrade = tower.Replicator:GetAttribute("Upgrade")
-    --sell tower
-    warn("[Debug] Selling tower...")
-    tFuncs(tower,3)
-    wait()
-    --Place tower
-    tower = tFuncs(tname,1,frame)
-    warn("[Debug] Placing Tower...")
-    wait()
-    --Upgrade tower
-    tFuncs(tower,2,upgrade)
-    warn("[Debug] Upgraded tower!")
-    wait()
-end
---Detects medic
+
 for i,v in pairs(game:GetService("Workspace").Towers:GetChildren()) do
-    if v:FindFirstChild("Owner").Value and v:FindFirstChild("Owner"). Value == game:GetService("Players").LocalPlayer.UserId and v.Replicator:GetAttribute("Type") == "Medic" then
-            table.insert(Medics,v)
-            status.Text = "Detected Medic!"
-            warn("Found Medic!")
-    else    
-            if checkStun(v) then
-                useAb = true
-            end
-            v.Replicator.Stuns.Changed:Connect(function()
-                if checkStun(v) then
-                    useAb = true --detects stuns, requests medic ability
-                end
-            end)
-    end
+   monitorTower(v)
 end
+
 getgenv().TowerAddedM = game:GetService("Workspace").Towers.ChildAdded:Connect(function(v)
     wait(.25)
     if not v:FindFirstChild("Replicator") then
         repeat wait() until v:FindFirstChild("Replicator")
     end
-    if v:FindFirstChild("Owner").Value and v:FindFirstChild("Owner").Value == game:GetService("Players").LocalPlayer.UserId and v.Replicator:GetAttribute("Type") == "Medic" then
-            table.insert(Medics,v)
-            status.Text = "Detected new medic placed!"
-    else
-            v.Replicator.Stuns.Changed:Connect(function()
-                if checkStun(v) then
-                    useAb = true
-                end
-            end)
-    end
+    monitorTower(v)
 end)
+
 getgenv().TowerRemovedM = game:GetService("Workspace").Towers.ChildRemoved:Connect(function(v)
     if v:FindFirstChild("Owner").Value and v:FindFirstChild("Owner").Value == game:GetService("Players").LocalPlayer.UserId and v.Replicator:GetAttribute("Type") == "Medic" then
         for i,t in next,Medics do
             if t == v then
                 table.remove(Medics,i)
-                status.Text = "Medic Removed!"
+                spawn(function()
+                    status.Text = "Medic Removed!"
+                    wait(1)
+                    status.Text = Medic()
+                end)             
             end
         end
     end
-    task.wait()
 end)
-wait(.5)
-status.Text = "Loaded! "..tostring(#Medics).." Medic(s) found!"
-local index = 0
-    while wait() do
-        if enabled and #Medics > 0 then
-            index = index + 1
-            if index > #Medics then
-                index = 1
-            end
-            repeat 
-            if Medics[index].Replicator:GetAttribute("Upgrade") < 5 then
-                index = index + 1
-                if index > #Medics then
-                    index = 1
-                end
-                status.Text = "Waiting for max medic..."
-                wait(.1)
-            end
-            until Medics[index].Replicator:GetAttribute("Upgrade") == 5 or (#Medics < 1)
-            repeat
-                wait(.1) 
-                status.Text = "Waiting for stun..."
-                if index > #Medics then
-                    index = 1
-                end --Index change (if there are 2 medics and u sell 1, it wont error)
-            until useAb==true or (#Medics < 1) 
-            wait(2)--slight delay to wait til towers are properly stunned
-            if #Medics > 0 then
-                warn("Detected stun! Using ability...")
-                MedicAbi(Medics[index])
-                status.Text = "Activated Medic Ability"
-                if microing then
-                    warn("[Debug] Microing medic...")
-                    microTower(Medics[index], "Microing Medic...")
-                end
-            end
-            useAb = false
-        elseif #Medics < 1 then
-                status.Text = 'Waiting for Medics...'
-        end
-    
-    end     
-
+status.Text = Medic()
 end)
 if not suc then warn(err) end
