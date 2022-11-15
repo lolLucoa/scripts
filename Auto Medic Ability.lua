@@ -39,7 +39,9 @@ local function microTower(tower,statuss)
 end
 
 local function checkStun(tower) -- checks stuns of tower
-    local stuns = tower.Replicator.Stuns
+    local repl = tower:FindFirstChild("Replicator")
+    if not repl then return false end 
+    local stuns = repl.Stuns
     for i,v in pairs(stuns:GetAttributes()) do
         if v == true then
             prints("Detected Stun!")
