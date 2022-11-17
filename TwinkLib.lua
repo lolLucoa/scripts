@@ -441,7 +441,48 @@ function UILibrary.Load(GUITitle, ShowShadow)
 			local HiddenLabel = TextLabel(Text, 12)
 			HiddenLabel.Parent = LabelForeground
 		end
+		
+		function PageLibrary.AddTextBox(Text, ConfigurationArray, Callback)
+			local Default = ConfigurationArray.Default or ConfigurationArray.Def or ""
+			local PlaceHolder = ConfigurationArray.PlaceHolder or ConfigurationArray.PH or ""
+			
+			local TextBoxContainer = Frame()
+			TextBoxContainer.Name = Text.."TEXTBOX"
+			TextBoxContainer.Size = UDim2.new(1,0,0,20)
+			TextBoxContainer.BackgroundTransparency = 1
+			TextBoxContainer.Parent = DisplayPage
 
+			local TextBoxForeGround = RoundBox(5)
+			TextBoxForeGround.Name = "TextBoxForeGround"
+			TextBoxForeGround.ImageColor3 = Color3.fromRGB(35,35,35)
+			TextBoxForeGround.Size = UDim2.new(1,0,1,0)
+			TextBoxForeGround.Parent = TextBoxContainer
+
+			local HiddenLabel = TextLabel(Text, 12)
+			HiddenLabel.TextXAlignment = Enum.TextXAlignment.Left
+			HiddenLabel.Position = UDim2.new(0,40,0,0)
+			HiddenLabel.Parent = TextBoxForeGround
+			
+			local TextBox = TextBox(Default, 12)
+			TextBox.BackgroundTransparency = 0
+			TextBox.BackgroundColor3 = Color3.fromRGB(45,45,45)
+			TextBox.TextWrapped = true
+			TextBox.Position = UDim2.new(1, -120, 0, 0)
+			TextBox.Size = UDim2.new(0, 115, 1, 0)
+			TextBox.ClearTextOnFocus = false
+			TextBox.Parent = TextBoxForeGround
+			
+			TextBox.Focused:Connect(function()
+				TextBox:TweenSizeAndPosition(UDim2.new(1, 0, 1, 0), UDim2.new(0, 0, 0, 0), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.1)
+			end)
+			TextBox.FocusLost:Connect(function()
+				TextBox:TweenSizeAndPosition(UDim2.new(0, 115, 1, 0), UDim2.new(1, -120, 0, 0), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.1)
+			end)
+			TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+				Callback(TextBox.Text)
+			end)
+		end
+		
 		function PageLibrary.AddDropdown(Text, ConfigurationArray, Callback)
 			local DropdownArray = ConfigurationArray or {}
 
