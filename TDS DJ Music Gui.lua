@@ -15,7 +15,18 @@ end
 local function Play(id)
     getDJ()
     if not DJ then return end
-    game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops", "Execute", {Data = {[1] = id}, Name = "Music", Tower = DJ})
+    local response = game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Troops", "Execute", {Data = {[1] = id}, Name = "Music", Tower = DJ})
+    if not response then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "DJ Music Gui",
+            Text = "You don't have the DJ Music Gamepass! The Audio will only play for you...";
+            Duration = 3;
+        })
+        local hrp = DJ:WaitForChild("HumanoidRootPart")
+        if hrp then
+            hrp:FindFirstChild("Music").SoundId = "rbxassetid://"..tostring(id)
+        end
+    end
 end
 
 -- Initialization
@@ -41,7 +52,9 @@ local TDSIds = {
     ['ManRobotics Emote'] = 9166993858,
     ['Transcendence'] = 9166996324,
     ['Solar Lobby Theme'] = 7653200934,
-    ['Turret Fire (troll)'] = 4743347100
+    ['Turret Fire (troll)'] = 4743347100,
+    ['Triumph!'] = 8013047518,
+    ['Ghost DJ'] = 5994058479
 }
 local PopularIds = {
     ['Crab Rave'] = 5410086218,
