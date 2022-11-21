@@ -11,6 +11,8 @@ local suc,err = pcall(function()
 local RS, TW, RF, LPSR = game:GetService("ReplicatedStorage"), workspace:WaitForChild("Towers"), game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"), nil
 local Medics, MedicIndex, MedicAbility, MedicMicro, StunnedCount, status, library = {}, 0, false, false, 0, nil,loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/ROBLOX/main/ModificationWallyUi", true))()
 local AbilityDelay = 2 --Change to 1.5, or 1. Whichever works best for you :)
+local Cooldown = 1 
+local canUseAbi = true
 local Debug = true
 local TowersStunnedBeforeAbility = 5 --Default option. Can be changed in the GUI
 --Functions
@@ -71,7 +73,12 @@ local function Medic()
         return "Waiting for stun..."
     end
         -- Use Ability
-    if MedicAbility then
+    if MedicAbility and canUseAbi then
+        canUseAbi = false
+        spawn(function()
+            wait(Cooldown)
+            canUseAbi = true
+        end)
         wait(AbilityDelay)
         if #Medics < 1 then return "You sold your medic ._." end
         if not selectedMedic then
