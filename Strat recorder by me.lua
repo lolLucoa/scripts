@@ -132,7 +132,7 @@ OldFunc = hookmetamethod(game, '__namecall',function(Self, ...)
                local AbiName = Args[4]['Name']
                local id = GetIdFromTower(tower)
                if id then
-                  AppFile(Args[2], {tostring(id), '"'..AbiName..'"', getTime()[1], getTime()[2], getTime()[3], isInbetween()})
+                  AppFile('Ability', {tostring(id), '"'..AbiName..'"', getTime()[1], getTime()[2], getTime()[3], isInbetween()})
                else
                   Log('Error! Ability failed because tower not found')
                end
