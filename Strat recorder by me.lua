@@ -19,7 +19,7 @@ local towers = {}
 local status = nil
 local CGui = game:GetService("CoreGui")
 local PGui = game.Players.LocalPlayer.PlayerGui
-writefile('TDS_AutoStrat\\'..game.ReplicatedStorage.State.Map.Value..' Recorder.txt', "")
+writefile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', "")
 
 --Gui
 w = UI:CreateWindow('Recorder..?')
@@ -80,12 +80,12 @@ local function GetNextPlacedTower(timeout)
 end
 local function AppFile(method, args)
    local final = 'TDS:'..method..'('..table.concat(args, ', ')..')\n'
-   appendfile('TDS_AutoStrat\\'..game.ReplicatedStorage.State.Map.Value..' Recorder.txt', final)
+   appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', final)
    Log(method..' '..args[1]) 
 end
 --Initialization
 Log('Loaded!')
-appendfile('TDS_AutoStrat\\'..game.ReplicatedStorage.State.Map.Value..' Recorder.txt', 'local TDS = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/ckmhjvskfkmsStratFun2", true))()\n')
+appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', 'local TDS = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/ckmhjvskfkmsStratFun2", true))()\n')
 for TowerName, Tower in next, game.ReplicatedStorage.RemoteFunction:InvokeServer("Session", "Search", "Inventory.Troops") do
    if (Tower.Equipped) then
       table.insert(TowersE, '"'..TowerName..'"')
@@ -105,7 +105,6 @@ OldFunc = hookmetamethod(game, '__namecall',function(Self, ...)
                   local tower = GetNextPlacedTower()
                   local pos, rot = Args[4]['Position'], Args[4]['Rotation']
                   if tower then
-                     print("test")
                      insert(towers, tower)
                      AppFile(Args[2], {'"'..Args[3]..'"', tostring(pos.x), tostring(pos.y), tostring(pos.z), getTime()[1], getTime()[2], getTime()[3], 'true', tostring(rot.x), tostring(rot.y), tostring(rot.z), isInbetween()})
                   else
@@ -123,7 +122,7 @@ OldFunc = hookmetamethod(game, '__namecall',function(Self, ...)
                local tower = Args[3]['Troop']
                local id = GetIdFromTower(tower)
                if id then
-                  towers[id] = nil
+                  towers[id] = 'nil' --so insert doesn't override it
                   AppFile(Args[2], {tostring(id), getTime()[1], getTime()[2], getTime()[3], isInbetween()})
                else
                   Log('Error! Sell failed because tower not found')
