@@ -74,14 +74,14 @@ local function AppFile(method, args)
    appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', final)
    Log(method..' '..args[1]) 
 end
-local function processArgs(Args, result)
+local function processArgs(Args, result, cTime)
    if Args[1] == 'Troops' then
       if Args[2] == 'Place' then
          local tower = result
          local pos, rot = Args[4]['Position'], Args[4]['Rotation']
          if tower and type(tower) ~= 'string' then
             insert(towers, tower)
-            AppFile(Args[2], {'"'..Args[3]..'"', tostring(pos.x), tostring(pos.y), tostring(pos.z), getTime()[1], getTime()[2], getTime()[3], 'true', tostring(rot.x), tostring(rot.y), tostring(rot.z), isInbetween()})
+            AppFile(Args[2], {'"'..Args[3]..'"', tostring(pos.x), tostring(pos.y), tostring(pos.z), cTime[1], cTime[2], cTime[3], 'true', tostring(rot.x), tostring(rot.y), tostring(rot.z), isInbetween()})
          else
             Log("Tower not placed!")
          end
@@ -94,7 +94,7 @@ local function processArgs(Args, result)
             if type(price) == 'boolean' then
                tower:SetAttribute('Maxxed', 0)
             end
-            AppFile(Args[2], {tostring(id), getTime()[1], getTime()[2], getTime()[3], isInbetween()})
+            AppFile(Args[2], {tostring(id), cTime[1], cTime[2], cTime[3], isInbetween()})
          else
             Log('Upgrade failed')
          end
@@ -103,17 +103,17 @@ local function processArgs(Args, result)
          local id = GetIdFromTower(tower)
          if id then
             towers[id] = false --so insert doesn't override it
-            AppFile(Args[2], {tostring(id), getTime()[1], getTime()[2], getTime()[3], isInbetween()})
+            AppFile(Args[2], {tostring(id), cTime[1], cTime[2], cTime[3], isInbetween()})
          else
             Log('Sell failed')
          end
-      elseif Args[2] == 'Abilities' then
+      elseif Args[2] == 'Abilities' and not table.find(Args[4], 'AutoChain') then
          local tower = Args[4]['Troop']
          local AbiName = Args[4]['Name']
          local id = GetIdFromTower(tower)
          local suc = result --true if success, false if not
          if id and suc then
-            AppFile('Ability', {tostring(id), '"'..AbiName..'"', getTime()[1], getTime()[2], getTime()[3], isInbetween()})
+            AppFile('Ability', {tostring(id), '"'..AbiName..'"', cTime[1], cTime[2], cTime[3], isInbetween()})
          else
             Log('Ability use failed')
          end
@@ -121,13 +121,13 @@ local function processArgs(Args, result)
          local tower = Args[4]['Troop']
          local id = GetIdFromTower(tower)
          if id then
-            AppFile(Args[2], {tostring(id), getTime()[1], getTime()[2], getTime()[3], isInbetween()})
+            AppFile(Args[2], {tostring(id), cTime[1], cTime[2], cTime[3], isInbetween()})
          else
             Log('Target change failed')
          end
       end
    elseif Args[1] == 'Waves' then
-      AppFile('Skip', {getTime()[1], getTime()[2], getTime()[3], isInbetween()})
+      AppFile('Skip', {cTime[1], cTime[2], cTime[3], isInbetween()})
    elseif Args[1] == 'Difficulty' then
       AppFile('Mode', {'"'..Args[3]..'"'})
    end
@@ -141,12 +141,12 @@ w:Button('Activate AutoChain', function()
       end
    end
    if #commanders >= 3 then
-      AppFile("AutoChain", {commanders[1], commanders[2], commanders[3], getTime()[1], getTime()[2], getTime()[3], isInbetween()})
+      AppFile("AutoChain", {commanders[1], commanders[2], commanders[3], cTime[1], cTime[2], cTime[3], isInbetween()})
       loadstring(game:HttpGet("https://banbus.cf/scripts/tdsautochain"))()
    end
 end)
 w:Button('Sell All Farms', function()
-   AppFile("SellAllFarms", {getTime()[1], getTime()[2], getTime()[3], isInbetween()})
+   AppFile("SellAllFarms", {cTime[1], cTime[2], cTime[3], isInbetween()})
    for i,v in pairs(workspace.Towers:GetChildren()) do
       if v and v.Replicator:GetAttribute("Type") == "Farm" and v.Owner.Value == lPlayer.UserId then
          event:InvokeServer('Troops', 'Sell', {Troop = v}, "Ignore") --5th true to silence
@@ -174,8 +174,9 @@ local namecall;namecall = hookmetamethod(game,"__namecall",function(self,...)
    if self == event and getnamecallmethod() == "InvokeServer" then
        local thread = coroutine.running()
        coroutine.wrap(function(self,...)    
+           local cTime = getTime()
            local a = self.InvokeServer(self,...)
-           processArgs(Args, a)
+           processArgs(Args, a, cTime)
            coroutine.resume(thread,a)
        end)(self,...)
        return coroutine.yield()
