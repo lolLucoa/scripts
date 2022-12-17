@@ -13,7 +13,8 @@ repeat task.wait() until game:IsLoaded() == true
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/ROBLOX/main/ModificationWallyUi", true))()
 local TowersE = {}
 local Players = game:GetService('Players')
-local event = game:GetService("ReplicatedStorage").RemoteFunction
+local repS = game:GetService("ReplicatedStorage")
+local event = repS:WaitForChild('RemoteFunction')
 local insert = table.insert
 local remove = table.remove
 local towers = {}
@@ -21,7 +22,8 @@ local status = nil
 local CGui = game:GetService("CoreGui")
 local lPlayer = game.Players.LocalPlayer
 local PGui = lPlayer.PlayerGui
-writefile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', "")
+local timer = repS:WaitForChild('State').Timer
+writefile(repS:WaitForChild('State').Map.Value..' Recorder.txt', "")
 
 --Gui
 local w = UI:CreateWindow('Recorder..?')
@@ -42,13 +44,13 @@ end
 local function getTime()
    local wave = lPlayer.PlayerGui.GameGui.Health.Wave.Text
    wave = string.sub(wave, 6, #wave)
-   local timet = game.ReplicatedStorage.State.Timer.Time.Value
+   local timet = timer.Time.Value
    local timem = math.floor(timet/60)
    local times = timet%60
    return {wave, tostring(timem), tostring(times)}
 end
 local function isInbetween()
-   if game.ReplicatedStorage.State.Timer.Time.Value<=5 and workspace:FindFirstChild('PathArrow') then
+   if timer.Time.Value<=5 and workspace:FindFirstChild('PathArrow') then
       return 'true'
    else
       return 'false'
@@ -71,7 +73,7 @@ local function GetNextPlacedTower()
 end
 local function AppFile(method, args)
    local final = 'TDS:'..method..'('..table.concat(args, ', ')..')\n'
-   appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', final)
+   appendfile(repS.State.Map.Value..' Recorder.txt', final)
    Log(method..' '..args[1]) 
 end
 local function processArgs(Args, result, cTime)
