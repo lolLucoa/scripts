@@ -45,20 +45,21 @@ local function Log(text)
       status.Text = text
    end
 end
-local function getTime()
-   local wave = lPlayer.PlayerGui.GameGui.Health.Wave.Text
-   wave = string.sub(wave, 6, #wave)
-   local timet = timer.Time.Value
-   local timem = math.floor(timet/60)
-   local times = timet%60
-   return {wave, tostring(timem), tostring(times)}
-end
 local function isInbetween()
    if timer.Time.Value<=5 and workspace:FindFirstChild('PathArrow') then
       return 'true'
    else
       return 'false'
    end
+end
+local function getTime()
+   local wave = lPlayer.PlayerGui.GameGui.Health.Wave.Text
+   wave = string.sub(wave, 6, #wave)
+   local timet = timer.Time.Value
+   local timem = math.floor(timet/60)
+   local times = timet%60
+   local isInbetween = isInbetween()
+   return {wave, tostring(timem), tostring(times), isInbetween}
 end
 local function GetIdFromTower(tower)
    for i,v in pairs(getgenv().towers) do
@@ -93,7 +94,7 @@ local function processArgs(Args, result, cTime)
             if type(price) == 'boolean' then
                tower:SetAttribute('Maxxed', 0)
             end
-            AppFile(Args[2], {tostring(id), cTime[1], cTime[2], cTime[3], isInbetween()})
+            AppFile(Args[2], {tostring(id), unpack(cTime)})
          else
             Log('Upgrade failed')
          end
@@ -102,7 +103,7 @@ local function processArgs(Args, result, cTime)
          local id = GetIdFromTower(tower)
          if id then
             getgenv().towers[id] = false --so insert doesn't override it
-            AppFile(Args[2], {tostring(id), cTime[1], cTime[2], cTime[3], isInbetween()})
+            AppFile(Args[2], {tostring(id), unpack(cTime)})
          else
             Log('Sell failed')
          end
@@ -112,7 +113,7 @@ local function processArgs(Args, result, cTime)
          local id = GetIdFromTower(tower)
          local suc = result --true if success, false if not
          if id and suc then
-            AppFile('Ability', {tostring(id), '"'..AbiName..'"', cTime[1], cTime[2], cTime[3], isInbetween()})
+            AppFile('Ability', {tostring(id), '"'..AbiName..'"', unpack(cTime)})
          else
             Log('Ability use failed')
          end
@@ -120,13 +121,13 @@ local function processArgs(Args, result, cTime)
          local tower = Args[4]['Troop']
          local id = GetIdFromTower(tower)
          if id then
-            AppFile(Args[2], {tostring(id), cTime[1], cTime[2], cTime[3], isInbetween()})
+            AppFile(Args[2], {tostring(id), unpack(cTime)})
          else
             Log('Target change failed')
          end
       end
    elseif Args[1] == 'Waves' and Args[2] == 'Skip' then
-      AppFile('Skip', {cTime[1], cTime[2], cTime[3], isInbetween()})
+      AppFile('Skip', unpack(cTime))
    elseif Args[1] == 'Difficulty' then
       AppFile('Mode', {'"'..Args[3]..'"'})
    end
@@ -135,20 +136,22 @@ end
 w:Button('Activate AutoChain', function()
    local cTime = getTime()
    local commanders = {}
-   for i,v in pairs(workspace.getgenv().towers:GetChildren()) do
+   for i,v in pairs(workspace.Towers:GetChildren()) do
       if v and v.Replicator:GetAttribute("Type") == "Commander" and v.Owner.Value == lPlayer.UserId then
          insert(commanders, GetIdFromTower(v))
       end
    end
    if #commanders >= 3 then
-      AppFile("AutoChain", {commanders[1], commanders[2], commanders[3], cTime[1], cTime[2], cTime[3], isInbetween()})
+      AppFile("AutoChain", {commanders[1], commanders[2], commanders[3], unpack(cTime)})
       loadstring(game:HttpGet("https://banbus.cf/scripts/tdsautochain"))()
+   else
+      Log('Not enough commanders!')
    end
 end)
 w:Button('Sell All Farms', function()
    local cTime = getTime()
-   AppFile("SellAllFarms", {cTime[1], cTime[2], cTime[3], isInbetween()})
-   for i,v in pairs(workspace.getgenv().towers:GetChildren()) do
+   AppFile("SellAllFarms", {unpack(cTime)})
+   for i,v in pairs(workspace.Towers:GetChildren()) do
       if v and v.Replicator:GetAttribute("Type") == "Farm" and v.Owner.Value == lPlayer.UserId then
          event:InvokeServer('Troops', 'Sell', {Troop = v}, "Ignore") --5th true to silence
       end
@@ -181,8 +184,7 @@ end
 
 
 -- Remote logger
-local OldFunc = nil
-local namecall;namecall = hookmetamethod(game,"__namecall",function(self,...)
+local namecall;namecall = hookmetamethod(game,"__namecall",newcclosure(function(self,...)
    local Args = {...}
    if self == event and getnamecallmethod() == "InvokeServer" then
        local thread = coroutine.running()
@@ -194,5 +196,8 @@ local namecall;namecall = hookmetamethod(game,"__namecall",function(self,...)
        end)(self,...)
        return coroutine.yield()
    end
+   if getnamecallmethod() == "FireServer" and self == repS:FindFirstChild('RemoteEvent') then
+      AppFile('Skip', unpack(getTime())) --doesn't work for some reason
+   end
    return namecall(self,...)
-end)
+end))
