@@ -1,7 +1,7 @@
 --[[
    OMG THANKS blissel#9994 for saving my life with the coroutine fix!!!!
 TO-DO:
-retries if tower id not found for 5s
+retries if tower id not found for 5s --not needed
 support for hardcore
 support for auto medic, etc. --autochain and sellfarms done
 idk? abi cooldown check? --done
@@ -136,6 +136,7 @@ local function processArgs(Args, result, cTime)
 end
 --Buttons
 w:Button('Activate AutoChain', function()
+   local cTime = getTime()
    local commanders = {}
    for i,v in pairs(workspace.Towers:GetChildren()) do
       if v and v.Replicator:GetAttribute("Type") == "Commander" and v.Owner.Value == lPlayer.UserId then
@@ -148,6 +149,7 @@ w:Button('Activate AutoChain', function()
    end
 end)
 w:Button('Sell All Farms', function()
+   local cTime = getTime()
    AppFile("SellAllFarms", {cTime[1], cTime[2], cTime[3], isInbetween()})
    for i,v in pairs(workspace.Towers:GetChildren()) do
       if v and v.Replicator:GetAttribute("Type") == "Farm" and v.Owner.Value == lPlayer.UserId then
