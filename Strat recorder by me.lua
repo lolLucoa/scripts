@@ -12,20 +12,19 @@ debug mode lmfao
 ]]
 repeat task.wait() until game:IsLoaded() == true
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/ROBLOX/main/ModificationWallyUi", true))()
-local TowersE = {}
+getgenv().towersE = {}
 local Players = game:GetService('Players')
 local repS = game:GetService("ReplicatedStorage")
 local event = repS:WaitForChild('RemoteFunction')
 local insert = table.insert
 local remove = table.remove
-local towers = {}
+getgenv().towers = {}
 local status = nil
 local CGui = game:GetService("CoreGui")
 local lPlayer = game.Players.LocalPlayer
 local PGui = lPlayer.PlayerGui
 local state = repS:WaitForChild('State')
 local timer = state.Timer
-local difficulty = state.Difficulty.Value
 local GoldenPerks = {}
 
 writefile(state.Map.Value..' Recorder.txt', "")
@@ -62,19 +61,12 @@ local function isInbetween()
    end
 end
 local function GetIdFromTower(tower)
-   for i,v in pairs(towers) do
+   for i,v in pairs(getgenv().towers) do
       if v == tower then
          return i
       end
    end
    return nil
-end
-local function GetNextPlacedTower()
-   local t = workspace.Towers.ChildAdded:Wait()
-   local o = t:WaitForChild('Owner')
-   if o.Value == lPlayer.UserId then
-      return t
-   end
 end
 local function AppFile(method, args)
    local final = 'TDS:'..method..'('..table.concat(args, ', ')..')\n'
@@ -87,7 +79,7 @@ local function processArgs(Args, result, cTime)
          local tower = result
          local pos, rot = Args[4]['Position'], Args[4]['Rotation']
          if tower and type(tower) ~= 'string' then
-            insert(towers, tower)
+            insert(getgenv().towers, tower)
             AppFile(Args[2], {'"'..Args[3]..'"', tostring(pos.x), tostring(pos.y), tostring(pos.z), cTime[1], cTime[2], cTime[3], 'true', tostring(rot.x), tostring(rot.y), tostring(rot.z), isInbetween()})
          else
             Log("Tower not placed!")
@@ -109,7 +101,7 @@ local function processArgs(Args, result, cTime)
          local tower = Args[3]['Troop']
          local id = GetIdFromTower(tower)
          if id then
-            towers[id] = false --so insert doesn't override it
+            getgenv().towers[id] = false --so insert doesn't override it
             AppFile(Args[2], {tostring(id), cTime[1], cTime[2], cTime[3], isInbetween()})
          else
             Log('Sell failed')
@@ -133,7 +125,7 @@ local function processArgs(Args, result, cTime)
             Log('Target change failed')
          end
       end
-   elseif Args[1] == 'Waves' then
+   elseif Args[1] == 'Waves' and Args[2] == 'Skip' then
       AppFile('Skip', {cTime[1], cTime[2], cTime[3], isInbetween()})
    elseif Args[1] == 'Difficulty' then
       AppFile('Mode', {'"'..Args[3]..'"'})
@@ -143,7 +135,7 @@ end
 w:Button('Activate AutoChain', function()
    local cTime = getTime()
    local commanders = {}
-   for i,v in pairs(workspace.Towers:GetChildren()) do
+   for i,v in pairs(workspace.getgenv().towers:GetChildren()) do
       if v and v.Replicator:GetAttribute("Type") == "Commander" and v.Owner.Value == lPlayer.UserId then
          insert(commanders, GetIdFromTower(v))
       end
@@ -156,7 +148,7 @@ end)
 w:Button('Sell All Farms', function()
    local cTime = getTime()
    AppFile("SellAllFarms", {cTime[1], cTime[2], cTime[3], isInbetween()})
-   for i,v in pairs(workspace.Towers:GetChildren()) do
+   for i,v in pairs(workspace.getgenv().towers:GetChildren()) do
       if v and v.Replicator:GetAttribute("Type") == "Farm" and v.Owner.Value == lPlayer.UserId then
          event:InvokeServer('Troops', 'Sell', {Troop = v}, "Ignore") --5th true to silence
       end
@@ -169,7 +161,7 @@ gui.ResetOnSpawn = false
 Log('Loaded!')
 for TowerName, Tower in next, game.ReplicatedStorage.RemoteFunction:InvokeServer("Session", "Search", "Inventory.Troops") do
    if (Tower.Equipped) then
-      table.insert(TowersE, '"'..TowerName..'"')
+      table.insert(getgenv().towersE, '"'..TowerName..'"')
       if (Tower.GoldenPerks) then
          table.insert(GoldenPerks, '"'..TowerName..'"')
       end
@@ -179,7 +171,8 @@ if #GoldenPerks > 0 then
    appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', 'getgenv().GoldenPerks = {'..table.concat(GoldenPerks, ', ')..'}\n')
 end
 appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', 'local TDS = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/ckmhjvskfkmsStratFun2", true))()\n')
-AppFile('Loadout', {table.concat(TowersE, ', ')})
+AppFile('Loadout', {table.concat(getgenv().towersE, ', ')})
+local difficulty = state.Difficulty.Value
 if difficulty == 'Hardcore' then
    AppFile('Map', {'"'..game.ReplicatedStorage.State.Map.Value..'"', 'true', "'Hardcore'"}) --HC support add later
 else
