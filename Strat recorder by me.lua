@@ -2,7 +2,8 @@
    OMG THANKS blissel#9994 for saving my life with the coroutine fix!!!!
 TO-DO:
 retries if tower id not found for 5s --not needed
-support for hardcore and other modes
+support for hardcore and other modes --fixed
+support for gperks --fixed
 support for auto medic, etc. --autochain and sellfarms done
 idk? abi cooldown check? --done
 success check for upgrades --done
