@@ -2,7 +2,7 @@
    OMG THANKS blissel#9994 for saving my life with the coroutine fix!!!!
 TO-DO:
 retries if tower id not found for 5s --not needed
-support for hardcore
+support for hardcore and other modes
 support for auto medic, etc. --autochain and sellfarms done
 idk? abi cooldown check? --done
 success check for upgrades --done
@@ -22,8 +22,12 @@ local status = nil
 local CGui = game:GetService("CoreGui")
 local lPlayer = game.Players.LocalPlayer
 local PGui = lPlayer.PlayerGui
-local timer = repS:WaitForChild('State').Timer
-writefile(repS:WaitForChild('State').Map.Value..' Recorder.txt', "")
+local state = repS:WaitForChild('State')
+local timer = state.Timer
+local difficulty = state.Difficulty.Value
+local GoldenPerks = {}
+
+writefile(state.Map.Value..' Recorder.txt', "")
 
 --Gui
 local w = UI:CreateWindow('Recorder..?')
@@ -162,14 +166,25 @@ gui.Parent = PGui
 gui.ResetOnSpawn = false
 --Initialization
 Log('Loaded!')
-appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', 'local TDS = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/ckmhjvskfkmsStratFun2", true))()\n')
 for TowerName, Tower in next, game.ReplicatedStorage.RemoteFunction:InvokeServer("Session", "Search", "Inventory.Troops") do
    if (Tower.Equipped) then
       table.insert(TowersE, '"'..TowerName..'"')
+      if (Tower.GoldenPerks) then
+         table.insert(GoldenPerks, '"'..TowerName..'"')
+      end
    end
 end
+if #GoldenPerks > 0 then
+   appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', 'getgenv().GoldenPerks = {'..table.concat(GoldenPerks, ', ')..'}\n')
+end
+appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', 'local TDS = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/ckmhjvskfkmsStratFun2", true))()\n')
 AppFile('Loadout', {table.concat(TowersE, ', ')})
-AppFile('Map', {'"'..game.ReplicatedStorage.State.Map.Value..'"', 'true', "'Survival'"}) --HC support add later
+if difficulty == 'Hardcore' then
+   AppFile('Map', {'"'..game.ReplicatedStorage.State.Map.Value..'"', 'true', "'Hardcore'"}) --HC support add later
+else
+   AppFile('Map', {'"'..game.ReplicatedStorage.State.Map.Value..'"', 'true', "'Survival'"}) --HC support add later
+end
+
 
 -- Remote logger
 local OldFunc = nil
