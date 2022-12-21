@@ -196,8 +196,7 @@ local namecall;namecall = hookmetamethod(game,"__namecall",newcclosure(function(
        end)(self,...)
        return coroutine.yield()
    end
-   if getnamecallmethod() == "FireServer" and self == repS:FindFirstChild('RemoteEvent') then
-      AppFile('Skip', unpack(getTime())) --doesn't work for some reason
-   end
    return namecall(self,...)
 end))
+--Autoskip Recorder (to be added)
+
