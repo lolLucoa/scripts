@@ -24,9 +24,10 @@ local CGui = game:GetService("CoreGui")
 local lPlayer = game.Players.LocalPlayer
 local PGui = lPlayer.PlayerGui
 local state = repS:WaitForChild('State')
-local timer = state.Timer
+local timer = state:WaitForChild('Timer')
+local WaveL = PGui:WaitForChild('GameGui'):WaitForChild('Health'):WaitForChild('Wave')
 local GoldenPerks = {}
-
+local Cwave, timem, times, timems
 writefile(state.Map.Value..' Recorder.txt', "")
 
 --Gui
@@ -52,14 +53,19 @@ local function isInbetween()
       return 'false'
    end
 end
-local function getTime()
-   local wave = lPlayer.PlayerGui.GameGui.Health.Wave.Text
-   wave = string.sub(wave, 6, #wave)
+local function updateTime()
+   Cwave = string.sub(WaveL.Text, 6, #WaveL.Text)
    local timet = timer.Time.Value
-   local timem = math.floor(timet/60)
-   local times = timet%60
-   local isInbetween = isInbetween()
-   return {wave, tostring(timem), tostring(times), isInbetween}
+   timem = math.floor(timet/60)
+   times = timet%60
+   timems = tick()
+end
+updateTime()
+timer.Time.Changed:Connect(updateTime)
+local function getTime()
+   local timediff = tostring(1 - (tick()-timems))
+   print(timediff)
+   return {Cwave, tostring(timem), tostring(times)..'.'..string.sub(timediff, 3, 3)--[[decimal place changer (the higher the 2nd no the more accurate)]], isInbetween()}
 end
 local function GetIdFromTower(tower)
    for i,v in pairs(getgenv().towers) do
@@ -127,7 +133,7 @@ local function processArgs(Args, result, cTime)
          end
       end
    elseif Args[1] == 'Waves' and Args[2] == 'Skip' then
-      AppFile('Skip', unpack(cTime))
+      AppFile('Skip', cTime)
    elseif Args[1] == 'Difficulty' then
       AppFile('Mode', {'"'..Args[3]..'"'})
    end
