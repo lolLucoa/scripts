@@ -11,11 +11,11 @@ maintain tower order, can be used by using separate loop to get them (in order)
 debug mode lmfao 
 ]]
 repeat task.wait() until game:IsLoaded() == true
-local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/ROBLOX/main/ModificationWallyUi", true))()
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/jsdnfjdsfdjnsmvkjhlkslzLIB", true))()
 getgenv().towersE = {}
 local Players = game:GetService('Players')
 local repS = game:GetService("ReplicatedStorage")
-local event = repS:WaitForChild('RemoteFunction')
+local rF = repS:WaitForChild('RemoteFunction')
 local insert = table.insert
 local remove = table.remove
 if not getgenv().towers then
@@ -30,6 +30,7 @@ local timer = state:WaitForChild('Timer')
 local WaveL = PGui:WaitForChild('GameGui'):WaitForChild('Health'):WaitForChild('Wave')
 local GoldenPerks = {}
 local Cwave, timem, times, timems
+local aS, aSP = false, state:WaitForChild('Voting'):WaitForChild("Enabled")
 writefile(state.Map.Value..' Recorder.txt', "")
 
 --Gui
@@ -66,7 +67,6 @@ updateTime()
 timer.Time.Changed:Connect(updateTime)
 local function getTime()
    local timediff = 1 - (tick()-timems)
-   print(timediff)
    return {Cwave, tostring(timem), string.format("%.1f", times + timediff)--[[decimal place changer]], isInbetween()}
 end
 local function GetIdFromTower(tower)
@@ -140,6 +140,7 @@ local function processArgs(Args, result, cTime)
       AppFile('Mode', {'"'..Args[3]..'"'})
    end
 end
+
 --Buttons
 w:Button('Activate AutoChain', function()
    local cTime = getTime()
@@ -161,10 +162,13 @@ w:Button('Sell All Farms', function()
    AppFile("SellAllFarms", {unpack(cTime)})
    for i,v in pairs(workspace.Towers:GetChildren()) do
       if v and v.Replicator:GetAttribute("Type") == "Farm" and v.Owner.Value == lPlayer.UserId then
-         event:InvokeServer('Troops', 'Sell', {Troop = v}, "Ignore") --5th true to silence
+         rF:InvokeServer('Troops', 'Sell', {Troop = v}, "Ignore") --5th true to silence
       end
    end
 end)
+w:Toggle('Auto Skip', {flag = "as"}, function(v) aS = v end)
+aSP:GetPropertyChangedSignal("Value"):Connect(function() if aS and aSP.Value then wait(.15) rF:InvokeServer('Waves', 'Skip') end end)
+--Gui settings
 local gui = CGui:FindFirstChild("ScreenGui")
 gui.Parent = PGui
 gui.ResetOnSpawn = false
@@ -194,7 +198,7 @@ end
 -- Remote logger
 local namecall;namecall = hookmetamethod(game,"__namecall",newcclosure(function(self,...)
    local Args = {...}
-   if self == event and getnamecallmethod() == "InvokeServer" then
+   if self == rF and getnamecallmethod() == "InvokeServer" then
        local thread = coroutine.running()
        coroutine.wrap(function(self,...)    
            local cTime = getTime()
