@@ -18,7 +18,9 @@ local repS = game:GetService("ReplicatedStorage")
 local event = repS:WaitForChild('RemoteFunction')
 local insert = table.insert
 local remove = table.remove
-getgenv().towers = {}
+if not getgenv().towers then
+   getgenv().towers = {}
+end
 local status = nil
 local CGui = game:GetService("CoreGui")
 local lPlayer = game.Players.LocalPlayer
@@ -63,9 +65,9 @@ end
 updateTime()
 timer.Time.Changed:Connect(updateTime)
 local function getTime()
-   local timediff = tostring(1 - (tick()-timems))
+   local timediff = 1 - (tick()-timems)
    print(timediff)
-   return {Cwave, tostring(timem), tostring(times)..'.'..string.sub(timediff, 3, 3)--[[decimal place changer (the higher the 2nd no the more accurate)]], isInbetween()}
+   return {Cwave, tostring(timem), string.format("%.1f", times + timediff)--[[decimal place changer]], isInbetween()}
 end
 local function GetIdFromTower(tower)
    for i,v in pairs(getgenv().towers) do
@@ -113,7 +115,7 @@ local function processArgs(Args, result, cTime)
          else
             Log('Sell failed')
          end
-      elseif Args[2] == 'Abilities' and not table.find(Args[4], 'AutoChain') then
+      elseif Args[2] == 'Abilities' and not Args[4]['AutoChain'] then
          local tower = Args[4]['Troop']
          local AbiName = Args[4]['Name']
          local id = GetIdFromTower(tower)
