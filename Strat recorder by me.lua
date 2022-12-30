@@ -7,8 +7,6 @@ support for gperks --fixed
 support for auto medic, etc. --autochain and sellfarms done
 idk? abi cooldown check? --done
 success check for upgrades --done
-maintain tower order, can be used by using separate loop to get them (in order)
-debug mode lmfao 
 ]]
 repeat task.wait() until game:IsLoaded() == true
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/jsdnfjdsfdjnsmvkjhlkslzLIB", true))()
@@ -50,7 +48,7 @@ local function Log(text)
    end
 end
 local function isInbetween()
-   if timer.Time.Value<=5 and workspace:FindFirstChild('PathArrow') then
+   if timer.Time.Value<=5 and workspace:FindFirstChild('PathArrow') and not getgenv().IgnoreIsInbetween then
       return 'true'
    else
       return 'false'
