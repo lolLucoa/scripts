@@ -68,6 +68,7 @@ function Console:Window(consoledebugger)
 
     local UserInputService = game:GetService("UserInputService")
     local runService = (game:GetService("RunService"));
+    local tService = game:GetService("TweenService")
 
     local gui = ambientShadow
 
@@ -222,6 +223,29 @@ function Console:Window(consoledebugger)
     AutoScroll_Title_2.TextColor3 = Color3.fromRGB(220, 220, 220)
     AutoScroll_Title_2.TextSize = 14.000
     AutoScroll_Title_2.TextXAlignment = Enum.TextXAlignment.Left
+
+    local function ScrollFrame()
+        if AutoScroll_Enabled then
+	        ConsoleContainer.CanvasPosition = UDim2.new(1, 0, 0, ConsoleContainerUIListLayout.AbsoluteContentSize.Y - ConsoleContainer.AbsoluteSize.Y)
+        end
+    end
+    ConsoleContainer:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(ScrollFrame)
+
+    local function ToggleAutoScroll(result)
+        if result then
+            AutoScroll_Inner:TweenPosition(UDim2.new(0.5, -2, 0, 2), "InOut", "Sine", .1)
+            tService:Create(AutoScroll, Tweeninfo.new(.1, "Sine", "InOut"), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}):Play()
+        else
+            AutoScroll_Inner:TweenPosition(UDim2.new(0, 2, 0, 2), "InOut", "Sine", .1)
+            tService:Create(AutoScroll, Tweeninfo.new(.1, "Sine", "InOut"), {BackgroundColor3 = Color3.fromRGB(58, 58, 58)}):Play()
+        end
+    end
+    ToggleAutoScroll(AutoScroll_Enabled)
+
+    AutoScroll.MouseButton1Click:Connect(function()
+        AutoScroll_Enabled = not AutoScroll_Enabled
+        ToggleAutoScroll(AutoScroll_Enabled)
+    end)
 
     local function ResizeContainer()
         ConsoleContainer.CanvasSize = UDim2.new(0, 0, 0, ConsoleContainerUIListLayout.AbsoluteContentSize.Y + ConsoleContainerUIListLayout.Padding.Offset)
