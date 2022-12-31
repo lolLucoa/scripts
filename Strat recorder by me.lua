@@ -1,12 +1,10 @@
 --[[
-   OMG THANKS blissel#9994 for saving my life with the coroutine fix!!!!
+STRAT RECORDER OWO - V1 Offical Release
+Gurt i know ur here use the god damn loadstring you pig
+uwu daddy thx for using my script!! ^uwu^
+
 TO-DO:
-retries if tower id not found for 5s --not needed
-support for hardcore and other modes --fixed
-support for gperks --fixed
-support for auto medic, etc. --autochain and sellfarms done
-idk? abi cooldown check? --done
-success check for upgrades --done
+Auto Medic
 ]]
 repeat task.wait() until game:IsLoaded() == true
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/jsdnfjdsfdjnsmvkjhlkslzLIB", true))()
@@ -29,10 +27,11 @@ local WaveL = PGui:WaitForChild('GameGui'):WaitForChild('Health'):WaitForChild('
 local GoldenPerks = {}
 local Cwave, timem, times, timems
 local aS, aSP = false, state:WaitForChild('Voting'):WaitForChild("Enabled")
-writefile(state.Map.Value..' Recorder.txt', "")
+local fileN = state.Map.Value..' Strat.txt'
+writefile(fileN, "")
 
 --Gui
-local w = UI:CreateWindow('Recorder..?')
+local w = UI:CreateWindow('Recorder ^w^')
 w:Section('Last Log:')
 w:Section('Loading...')
 for i,v in pairs(CGui:GetDescendants()) do
@@ -65,7 +64,7 @@ updateTime()
 timer.Time.Changed:Connect(updateTime)
 local function getTime()
    local timediff = 1 - (tick()-timems)
-   return {Cwave, tostring(timem), string.format("%.1f", times + timediff)--[[decimal place changer]], isInbetween()}
+   return {Cwave, tostring(timem), string.format("%.1f", times + timediff), isInbetween()}
 end
 local function GetIdFromTower(tower)
    for i,v in pairs(getgenv().towers) do
@@ -77,7 +76,7 @@ local function GetIdFromTower(tower)
 end
 local function AppFile(method, args)
    local final = 'TDS:'..method..'('..table.concat(args, ', ')..')\n'
-   appendfile(repS.State.Map.Value..' Recorder.txt', final)
+   appendfile(fileN, final)
    Log(method..' '..args[1]) 
 end
 local function processArgs(Args, result, cTime)
@@ -181,17 +180,16 @@ for TowerName, Tower in next, game.ReplicatedStorage.RemoteFunction:InvokeServer
    end
 end
 if #GoldenPerks > 0 then
-   appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', 'getgenv().GoldenPerks = {'..table.concat(GoldenPerks, ', ')..'}\n')
+   appendfile(fileN, 'getgenv().GoldenPerks = {'..table.concat(GoldenPerks, ', ')..'}\n')
 end
-appendfile(game.ReplicatedStorage.State.Map.Value..' Recorder.txt', 'local TDS = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/ckmhjvskfkmsStratFun2", true))()\n')
+appendfile(fileN, 'local TDS = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/ckmhjvskfkmsStratFun2", true))()\n')
 AppFile('Loadout', {table.concat(getgenv().towersE, ', ')})
 local difficulty = state.Difficulty.Value
 if difficulty == 'Hardcore' then
-   AppFile('Map', {'"'..game.ReplicatedStorage.State.Map.Value..'"', 'true', "'Hardcore'"}) --HC support add later
+   AppFile('Map', {'"'..state.Map.Value..'"', 'true', "'Hardcore'"}) --HC support add later
 else
-   AppFile('Map', {'"'..game.ReplicatedStorage.State.Map.Value..'"', 'true', "'Survival'"}) --HC support add later
+   AppFile('Map', {'"'..state.Map.Value..'"', 'true', "'Survival'"}) --HC support add later
 end
-
 
 -- Remote logger
 local namecall;namecall = hookmetamethod(game,"__namecall",newcclosure(function(self,...)
@@ -208,5 +206,3 @@ local namecall;namecall = hookmetamethod(game,"__namecall",newcclosure(function(
    end
    return namecall(self,...)
 end))
---Autoskip Recorder (to be added)
-
