@@ -226,8 +226,7 @@ function Console:Window(consoledebugger)
 
     local function ScrollFrame()
         if AutoScroll_Enabled then
-            print("scrol")
-	        ConsoleContainer.CanvasPosition = Vector2.new(1, 0, 0, ConsoleContainerUIListLayout.AbsoluteContentSize.Y - ConsoleContainer.AbsoluteSize.Y)
+	        ConsoleContainer.CanvasPosition = Vector2.new(0, ConsoleContainerUIListLayout.AbsoluteContentSize.Y - ConsoleContainer.AbsoluteSize.Y)
         end
     end
     ConsoleContainerUIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(ScrollFrame)
