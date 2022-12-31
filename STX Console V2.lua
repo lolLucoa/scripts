@@ -234,10 +234,10 @@ function Console:Window(consoledebugger)
     local function ToggleAutoScroll(result)
         if result then
             AutoScroll_Inner:TweenPosition(UDim2.new(0.5, -2, 0, 2), "InOut", "Sine", .1)
-            tService:Create(AutoScroll, TweenInfo.new(.1, "Sine", "InOut"), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}):Play()
+            tService:Create(AutoScroll, TweenInfo.new(.1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}):Play()
         else
             AutoScroll_Inner:TweenPosition(UDim2.new(0, 2, 0, 2), "InOut", "Sine", .1)
-            tService:Create(AutoScroll, TweenInfo.new(.1, "Sine", "InOut"), {BackgroundColor3 = Color3.fromRGB(58, 58, 58)}):Play()
+            tService:Create(AutoScroll, TweenInfo.new(.1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(58, 58, 58)}):Play()
         end
     end
     ToggleAutoScroll(AutoScroll_Enabled)
