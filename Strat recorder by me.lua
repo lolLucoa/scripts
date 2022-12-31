@@ -7,7 +7,8 @@ TO-DO:
 Auto Medic
 ]]
 repeat task.wait() until game:IsLoaded() == true
-local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/jsdnfjdsfdjnsmvkjhlkslzLIB", true))()
+--local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/jsdnfjdsfdjnsmvkjhlkslzLIB", true))()
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/TacoCatBackWardsIsTacoCat/scripts/main/Azure%20Lib%20V2.lua", true))()
 getgenv().towersE = {}
 local Players = game:GetService('Players')
 local repS = game:GetService("ReplicatedStorage")
@@ -17,7 +18,6 @@ local remove = table.remove
 if not getgenv().towers then
    getgenv().towers = {}
 end
-local status = nil
 local CGui = game:GetService("CoreGui")
 local lPlayer = game.Players.LocalPlayer
 local PGui = lPlayer.PlayerGui
@@ -33,12 +33,7 @@ writefile(fileN, "")
 --Gui
 local w = UI:CreateWindow('Recorder ^w^')
 w:Section('Last Log:')
-w:Section('Loading...')
-for i,v in pairs(CGui:GetDescendants()) do
-    if v:IsA("TextLabel") and v.Text == "Loading..." then
-        status = v
-    end
-end
+local status = w:Section('Loading...')['section_lbl']
 --local functions
 local function Log(text)
    print(text)
