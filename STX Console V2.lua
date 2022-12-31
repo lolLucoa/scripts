@@ -229,7 +229,7 @@ function Console:Window(consoledebugger)
 	        ConsoleContainer.CanvasPosition = UDim2.new(1, 0, 0, ConsoleContainerUIListLayout.AbsoluteContentSize.Y - ConsoleContainer.AbsoluteSize.Y)
         end
     end
-    ConsoleContainer:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(ScrollFrame)
+    ConsoleContainerUIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(ScrollFrame)
 
     local function ToggleAutoScroll(result)
         if result then
