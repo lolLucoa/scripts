@@ -2163,6 +2163,7 @@ function OpenHome()
 		Domain.Home.Discord.Size = UDim2.new(0.157, 0, 0.137, 0)
 		Domain.Home.Discord.Position = UDim2.new(0.013,0,0.165,0)
 		-- Friends
+		pcall(CheckFriends)
 		Domain.Home.Friends.BackgroundTransparency = 1
 		Domain.Home.Friends.Icon.ImageTransparency = 1
 		Domain.Home.Friends.Info.TextTransparency = 1
