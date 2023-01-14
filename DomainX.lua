@@ -133,7 +133,7 @@ local Init = function() end
 local MlemixMode = false
 
 
-local Release = 1.97
+local Release = 1.100
 local KeySystemEnabled = false
 local ReleaseType = "Release"
 local Public = true
@@ -4325,15 +4325,15 @@ function PlaySound()
 	Domain.Home.Music.PlayingTitle.Text = "Now Playing"
 	MusicPlaying = true
 	local MusicSound = Instance.new("Sound",Domain)
-	MusicSound.Volume = 1
-	MusicSound.SoundId = "rbxassetid://"..Domain.Home.Music.ID.IDFrame.IDBox.Text
-	CurrentMusicInfo = game:GetService("MarketplaceService"):GetProductInfo(tonumber(Domain.Home.Music.ID.IDFrame.IDBox.Text))
+	MusicSound.Volume = 10
+	MusicSound.SoundId = getsynasset(Domain.Home.Music.ID.IDFrame.IDBox.Text)
+	CurrentMusicInfo = Domain.Home.Music.ID.IDFrame.IDBox.Text
 	Domain.Home.Music.ID.IDFrame.IDBox.Text = ""
 	MusicSound.TimePosition = 0
 	MusicSound.Looped = true
 	MusicSound:Play()
 	if CurrentMusicInfo then
-		Domain.Home.Music.Playing.Text = CurrentMusicInfo.Name
+		Domain.Home.Music.Playing.Text = CurrentMusicInfo
 	else
 		Domain.Home.Music.Playing.Text = "Unknown"
 	end
@@ -4354,7 +4354,7 @@ Domain.Home.Music.Toggle.MouseButton1Click:Connect(function()
 		end
 	elseif not MusicPlaying then
 		if not Domain:FindFirstChildWhichIsA("Sound") then
-			Toast("Please start a sound using the Asset ID bar above")
+			Toast("Please start a sound using the Sound Loader bar above")
 		else
 			MusicPlaying = true
 			Domain.Home.Music.Toggle.ImageRectOffset = Vector2.new(804,124)
@@ -4364,6 +4364,7 @@ Domain.Home.Music.Toggle.MouseButton1Click:Connect(function()
 	end
 end)
 
+Domain.Home.Music.ID.IDFrame.IDBox.PlaceholderText = "song.mp3"
 Domain.Home.Music.ID.IDFrame.IDBox.FocusLost:Connect(function()
 	PlaySound()
 end)
