@@ -239,7 +239,7 @@ local UniversalScripts = {
 	Dex = {
 		Name = "Dex Explorer",
 		Author = "Moon",
-		Loadstring = "https://pastebin.com/raw/fPP8bZ8Z",
+		Loadstring = "https://raw.githubusercontent.com/peyton2465/Dex/master/out.lua",
 		Colour = Color3.fromRGB(120, 170, 160),
 	},
 
