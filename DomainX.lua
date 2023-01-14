@@ -126,14 +126,14 @@ local DiscordLink = "discord.gg/sirius"
 local DiscordLink2 = "sirius"
 local NotificationDuration = 7
 local DomainEnabled = true
-local Price = "$7.99"
+local Price = "$0.00"
 local CustomFolderName = "DomainX Custom Scripts"
 local KeyWaitTime = 60
-
+local Init = function() end
 local MlemixMode = false
 
 
-local Release = 1.96
+local Release = 1.97
 local KeySystemEnabled = false
 local ReleaseType = "Release"
 local Public = true
@@ -173,7 +173,7 @@ local PlayerFlySpeed = 1
 local PremiumToastRequired = false
 local ServerhopCancelled = false
 local serverhopdb = false
-local timesince = 0
+local timesince = tick()
 local CustomScriptEnabled = false
 local firsttime = false
 local DMNReady = false
@@ -2163,7 +2163,7 @@ function OpenHome()
 		Domain.Home.Discord.Size = UDim2.new(0.157, 0, 0.137, 0)
 		Domain.Home.Discord.Position = UDim2.new(0.013,0,0.165,0)
 		-- Friends
-		pcall(CheckFriends)
+		pcall(Init)
 		Domain.Home.Friends.BackgroundTransparency = 1
 		Domain.Home.Friends.Icon.ImageTransparency = 1
 		Domain.Home.Friends.Info.TextTransparency = 1
@@ -4880,16 +4880,16 @@ end
 
 BootDomainX()
 
-coroutine.wrap(function()
+Init = function()
+	spawn(function()
 	Domain.Main.Time.Text = tostring(GetDate():format("#h:#m"))
 	wait(1)
 	if Domain then
 		CheckTime()
 		local function updstuff()
-			timesince = timesince + 4
 			Domain.Home.Data.data.Executor.Text = "Executor: <b>"..Client.."</b>"
 			Domain.Home.Data.data.Version.Text = "Version: <b>v"..Release.."</b>"
-			Domain.Home.Data.data.Time.Text = "Time Since Boot: <b>"..tostring(timesince).."s</b>"
+			Domain.Home.Data.data.Time.Text = "Time Since Boot: <b>"..string.format("%.0f", tick() - timesince).."s</b>"
 			if not CheckWritefile() then
 				Domain.Home.Data.data.File.Text = "Data File: <b>Disabled</b>"
 			else
@@ -4929,14 +4929,15 @@ coroutine.wrap(function()
 				FriendsInGame = FriendsInGame + 1
 			end
 		end
-		Domain.Home.Friends.All.FriendsAll.Text = tostring(FriendsInTotal).." users"
-		Domain.Home.Friends.Offline.FriendsOffline.Text = tostring(FriendsInTotal - OnlineFriends).." users"
-		Domain.Home.Friends.Online.FriendsOnline.Text = tostring(OnlineFriends).." users"
-		Domain.Home.Friends.InServer.FriendsInGame.Text = tostring(FriendsInGame).." users"
+		Domain.Home.Friends.All.FriendsAll.Text = tostring(FriendsInTotal).." user(s)"
+		Domain.Home.Friends.Offline.FriendsOffline.Text = tostring(FriendsInTotal - OnlineFriends).." user(s)"
+		Domain.Home.Friends.Online.FriendsOnline.Text = tostring(OnlineFriends).." user(s)"
+		Domain.Home.Friends.InServer.FriendsInGame.Text = tostring(FriendsInGame).." user(s)"
 	end
 	pcall(CheckFriends)
-end)()
-
+	end) --spawn end
+end
+Init()
 
 
 coroutine.wrap(function()
@@ -4945,12 +4946,12 @@ coroutine.wrap(function()
 	Toast(DiscordLink,"GothamBold")
 end)()
 
-while true do
-	wait(0.2)
+while wait(0.2) do
 	if Domain:FindFirstChild("Main") == false then
 		return
 	end
 	Domain.Main.Time.Text = tostring(GetDate():format("#h:#m"))
 	FpsLabel.Text = tostring(UpdatedFPS)
 	Domain.Main.Time.Text = tostring(GetDate():format("#h:#m"))
+	Domain.Home.Data.data.Time.Text = "Time Since Boot: <b>"..string.format("%.0f", tick() - timesince).."s</b>"
 end
