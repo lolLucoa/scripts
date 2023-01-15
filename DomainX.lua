@@ -4368,6 +4368,7 @@ Domain.Home.Music.ID.IDFrame.IDBox.PlaceholderText = "song.mp3"
 if CheckWritefile() then
 	if isfile(SongFileName) then
 		Domain.Home.Music.ID.IDFrame.IDBox.Text = readfile(SongFileName)
+		PlaySound()
 	else
 		delfile(SongFileName)
 	end
@@ -4876,6 +4877,8 @@ function CheckTime()
 		Domain.Home.Welcome.Text = "Evening, "..LocalPlayer.DisplayName
 	elseif tonumber(GetDate():format("#h")) > 13 then
 		Domain.Home.Welcome.Text = "Afternoon, "..LocalPlayer.DisplayName
+	elseif tonumber(GetDate():format("#h")) == 12 then
+		Domain.Home.Welcome.Text = "It's high noon, "..LocalPlayer.DisplayName
 	elseif tonumber(GetDate():format("#h")) > 7 then
 		Domain.Home.Welcome.Text = "Morning, "..LocalPlayer.DisplayName
 	else
@@ -4889,6 +4892,8 @@ function CheckTime()
 		Domain.Home.WelcomeSub.Text = "It's getting late.."
 	elseif tonumber(GetDate():format("#h")) > 13 then
 		Domain.Home.WelcomeSub.Text = "Any plans this afternoon?"
+	elseif tonumber(GetDate():format("#h")) == 12 then
+		Domain.Home.WelcomeSub.Text = "Yeehaww!!"
 	elseif tonumber(GetDate():format("#h")) > 7 then
 		Domain.Home.WelcomeSub.Text = "Rise and shine!"
 	else
