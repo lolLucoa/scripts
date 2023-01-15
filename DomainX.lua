@@ -2141,7 +2141,7 @@ function OpenHome()
 			game:GetService("StarterGui"):SetCoreGuiEnabled(coregui,false)
 		end
 		local transitionInfo = TweenInfo.new(0.8, Enum.EasingStyle.Quint)
-		local tween = TweenService:Create(Domain.Home.Wallpaper, transitionInfo, {ImageTransparency = 0})
+		local tween = TweenService:Create(Domain.Home.Wallpaper, transitionInfo, {ImageTransparency = 0.25})
 		tween:Play()
 		-- NOTIFICATION
 		local transitionInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quint)
@@ -4318,7 +4318,6 @@ function PlaySound(DisablePlay)
 		Domain:FindFirstChildWhichIsA("Sound"):Destroy()
 	end
 	Domain.Home.Music.PlayingTitle.Text = "Now Playing"
-	MusicPlaying = true
 	local MusicSound = Instance.new("Sound",Domain)
 	MusicSound.Volume = 10
 	CurrentMusicInfo = Domain.Home.Music.ID.IDFrame.IDBox.Text
@@ -4333,6 +4332,7 @@ function PlaySound(DisablePlay)
 	MusicSound.Looped = true
 	if not DisablePlay then
 		MusicSound:Play()
+		MusicPlaying = true
 	end
 	if CurrentMusicInfo then
 		Domain.Home.Music.Playing.Text = CurrentMusicInfo
