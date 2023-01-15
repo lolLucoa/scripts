@@ -1,9 +1,11 @@
 --[[
-STRAT RECORDER OWO - V1 Offical Release
+STRAT RECORDER OWO - V1.1 Offical Release
 Gurt i know ur here use the god damn loadstring you pig
 uwu daddy thx for using my script!! ^uwu^
+----Changelog----
+-Fixed timediff (why script so funny MM?)
 
-TO-DO:
+----TO-DO----
 Auto Medic
 ]]
 repeat task.wait() until game:IsLoaded() == true
@@ -58,7 +60,7 @@ end
 updateTime()
 timer.Time.Changed:Connect(updateTime)
 local function getTime()
-   local timediff = 1 - (tick()-timems)
+   local timediff = tick()-timems --This is messed up MM pls fix
    return {Cwave, tostring(timem), string.format("%.1f", times + timediff), isInbetween()}
 end
 local function GetIdFromTower(tower)
@@ -181,9 +183,9 @@ appendfile(fileN, 'local TDS = loadstring(game:HttpGet("https://raw.githubuserco
 AppFile('Loadout', {table.concat(getgenv().towersE, ', ')})
 local difficulty = state.Difficulty.Value
 if difficulty == 'Hardcore' then
-   AppFile('Map', {'"'..state.Map.Value..'"', 'true', "'Hardcore'"}) --HC support add later
+   AppFile('Map', {'"'..state.Map.Value..'"', 'true', "'Hardcore'"}) 
 else
-   AppFile('Map', {'"'..state.Map.Value..'"', 'true', "'Survival'"}) --HC support add later
+   AppFile('Map', {'"'..state.Map.Value..'"', 'true', "'Survival'"}) 
 end
 
 -- Remote logger
