@@ -128,7 +128,7 @@ local Init = function() end
 local MlemixMode = false
 
 
-local Release = 1.12
+local Release = 1.11
 local KeySystemEnabled = false
 local ReleaseType = "Release"
 local Public = true
@@ -4313,7 +4313,7 @@ Domain.Player.Fly.Interact.MouseButton1Click:Connect(function()
 	end
 end)
 
-function PlaySound()
+function PlaySound(DisablePlay)
 	if Domain:FindFirstChildWhichIsA("Sound") then
 		Domain:FindFirstChildWhichIsA("Sound"):Destroy()
 	end
@@ -4331,7 +4331,9 @@ function PlaySound()
 	Domain.Home.Music.ID.IDFrame.IDBox.Text = ""
 	MusicSound.TimePosition = 0
 	MusicSound.Looped = true
-	MusicSound:Play()
+	if not DisablePlay then
+		MusicSound:Play()
+	end
 	if CurrentMusicInfo then
 		Domain.Home.Music.Playing.Text = CurrentMusicInfo
 	else
@@ -4368,7 +4370,7 @@ Domain.Home.Music.ID.IDFrame.IDBox.PlaceholderText = "song.mp3"
 if CheckWritefile() then
 	if isfile(SongFileName) then
 		Domain.Home.Music.ID.IDFrame.IDBox.Text = readfile(SongFileName)
-		PlaySound()
+		PlaySound(true)
 	else
 		delfile(SongFileName)
 	end
