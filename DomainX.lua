@@ -2591,7 +2591,7 @@ function ChangeWallpaper(WallpaperFileName)
 				Toast("Missing getcustomasset function")
 			end
 			local transitionInfo = TweenInfo.new(0.8, Enum.EasingStyle.Quint)
-			local tween = TweenService:Create(Domain.Home.Wallpaper, transitionInfo, {ImageTransparency = 0})
+			local tween = TweenService:Create(Domain.Home.Wallpaper, transitionInfo, {ImageTransparency = 0.25})
 			tween:Play()
 		else
 			Notify("Couldn't locate file","We couldn't locate the file for use, make sure you add .png or .jpeg to the textbox",3944676352)
