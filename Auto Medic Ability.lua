@@ -1,7 +1,4 @@
---[[Rewrote the entire auto medic because it was messy
-- More features, such as min. towers stunned
-- A LOT more optimization, should produce 0 lag
-- Not adding distance checks because it's 
+--[[Fixed everything lmao
 Credits to 
 Gal. Sigmanic#6607 for some functions, such as troop detection
 Made my MintTea#9260
@@ -11,8 +8,7 @@ local suc,err = pcall(function()
 local RS, TW, RF, LPSR = game:GetService("ReplicatedStorage"), workspace:WaitForChild("Towers"), game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"), nil
 local Medics, MedicIndex, MedicAbility, MedicMicro, StunnedCount, status, library = {}, 0, false, false, 0, nil,loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/ROBLOX/main/ModificationWallyUi", true))()
 local AbilityDelay = 2 --Change to 1.5, or 1. Whichever works best for you :)
-local Cooldown = 1 
-local canUseAbi = true
+local Debounce = false
 local Debug = true
 local TowersStunnedBeforeAbility = 5 --Default option. Can be changed in the GUI
 --Functions
@@ -37,7 +33,7 @@ local function microTower(tower,statuss)
         RF:InvokeServer("Troops","Upgrade","Set",{Troop = tower})
     end
     prints("Microed tower!")
-    return towerMedics
+    return tower
 end
 
 local function checkStun(tower) -- checks stuns of tower
@@ -61,7 +57,7 @@ local function refreshStun(medic)
     end
     return st
 end
-local function Medic()
+local function Medic1()
     if #Medics < 1 then
         return "Waiting for Medic..."
     end
@@ -73,12 +69,7 @@ local function Medic()
         return "Waiting for stun..."
     end
         -- Use Ability
-    if MedicAbility and canUseAbi then
-        canUseAbi = false
-        spawn(function()
-            wait(Cooldown)
-            canUseAbi = true
-        end)
+    if MedicAbility then
         wait(AbilityDelay)
         if #Medics < 1 then return "You sold your medic ._." end
         if not selectedMedic then
@@ -96,21 +87,31 @@ local function Medic()
         if not Re then --Ability on cooldown, micro medic
             if MedicMicro then
                 if selectedMedic.Replicator:GetAttribute("Worth") > LPSR:GetAttribute("Cash") then return "You can't afford to Micro! Waiting..." end
-                selectedMedic = microTower(selectedMedic)
+                selectedMedic = microTower(selectedMedic, "Microing Medic...")
                 RF:InvokeServer("Troops","Abilities","Activate",{Troop = selectedMedic,Name = "Cleansing"})       
                 StunnedCount = refreshStun(selectedMedic)
-                return "Successfully Microed Medic!"
+                return "Used Ability!"
             else
                 return "Ability on cooldown... Waiting..."
             end
         else
             StunnedCount = refreshStun(selectedMedic)
-            return "Successfully used Ability!"
+            return "Used Ability!"
         end
     else
         return "Medic Ability Not turned on!"
     end
     return "An error occured..."
+end
+local function Medic()
+    if not Debounce then
+        Debounce = true
+        local re = Medic1()
+        Debounce = false
+        return re or "An error occured..."
+    else
+        return status.Text
+    end
 end
 
 local function monitorTower(tower)
@@ -157,21 +158,21 @@ end
 if not game:IsLoaded() then game.Loaded:Wait() end
 if getgenv().AlrExecMAC then
 	game.StarterGui:SetCore("SendNotification", {
-        Title = "Auto Medic V2",
+        Title = "Auto Medic V3",
         Text = "Script Already Executed.";
         Duration = 6;
 	})
 	return
 elseif game.PlaceId ~= 5591597781 then
     game.StarterGui:SetCore("SendNotification", {
-        Title = "Auto Medic V2",
+        Title = "Auto Medic V3",
         Text = "Not in game! Killing script...";
         Duration = 6;
     })
     return
 else
     game.StarterGui:SetCore("SendNotification", {
-        Title = "Auto Medic V2",
+        Title = "Auto Medic V3",
         Text = "Script Executed! Enjoy :)";
         Duration = 6;
     })
@@ -183,7 +184,7 @@ for i,v in pairs(RS.StateReplicators:GetChildren()) do
     end
 end
 --Main Script 
-local w = library:CreateWindow("Auto Medic Ability V2")
+local w = library:CreateWindow("Auto Medic Ability V3")
 w:Toggle("Auto Medic Abilities", {flag='enabled'}, function() MedicAbility = w.flags.enabled end)
 w:Toggle("Auto Micro Medics", {flag='microing'}, function() MedicMicro = w.flags.microing end)
 w:Slider("Min. Stuns",{min = 1, max = 20, default=5, pricise = true, flag = w.flags.mintower},function(value)
@@ -194,7 +195,7 @@ end)
 w:Button("Delete Gui",function()
     --w:DestroyGui() --Can't be used due to the latest UI loadstring being obfuscated and MM isn't gonna be happy
     for i,v in pairs(game:GetService("CoreGui"):GetDescendants()) do
-        if v:IsA("Frame") and v.Name == "Auto Medic Ability V2" then
+        if v:IsA("Frame") and v.Name == "Auto Medic Ability V3" then
             v.Parent.Parent:Destroy()
         end
     end
