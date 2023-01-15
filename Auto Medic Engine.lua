@@ -1,6 +1,5 @@
-
 local RS, TW, RF, LPSR = game:GetService("ReplicatedStorage"), workspace:WaitForChild("Towers"), game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"), nil
-local Medics, MedicIndex, MedicAbility, MedicMicro, StunnedCount, status = {}, 0, true, false, 0, nil
+local Medics, MedicIndex, MedicAbility, MedicMicro, StunnedCount = {}, 0, true, false, 0
 local AutoMedic = {}
 local AbilityDelay = 2 --Change to 1.5, or 1. Whichever works best for you :)
 local Debounce = false
@@ -12,10 +11,7 @@ local function prints(v)
         warn(v)
     end
 end
-local function microTower(tower,statuss)
-    if statuss then
-        status.Text = statuss
-    end
+local function microTower(tower)
     local frame = tower.HumanoidRootPart.CFrame
     local tname = tower.Replicator:GetAttribute("Type")
     local upgrade = tower.Replicator:GetAttribute("Upgrade")
@@ -104,8 +100,6 @@ local function Medic()
         local re = Medic1()
         Debounce = false
         return re or "An error occured..."
-    else
-        return status.Text
     end
 end
 
@@ -113,7 +107,7 @@ local function monitorTower(tower)
     if tower:FindFirstChild("Owner").Value and tower:FindFirstChild("Owner").Value == game:GetService("Players").LocalPlayer.UserId and tower.Replicator:GetAttribute("Type") == "Medic" then
         table.insert(Medics,tower)
         prints("Medic found! Adding to list...")
-        status.Text = Medic()
+        prints(Medic())
         if tower.Replicator:GetAttribute("Upgrade") < 5 then
             local Temp = nil
             Temp = tower.Replicator:GetAttributeChangedSignal("Upgrade"):Connect(function()
@@ -123,7 +117,7 @@ local function monitorTower(tower)
                 end
                 if tower.Replicator:GetAttribute("Upgrade") == 5 then
                     prints("Medic maxed!")
-                    status.Text = Medic()
+                    prints(Medic())
                     Temp:Disconnect()
                 end
             end)
@@ -133,7 +127,7 @@ local function monitorTower(tower)
         if checkStun(tower) then
             StunnedCount = StunnedCount + 1
             if StunnedCount >= TowersStunnedBeforeAbility then
-                status.Text = Medic()
+                prints(Medic())
                 prints("Stunned count reached! using abi...")
             end
         end
@@ -141,7 +135,7 @@ local function monitorTower(tower)
             if checkStun(tower) then
                 StunnedCount = StunnedCount + 1 --detects stuns, requests medic ability
                 if StunnedCount >= TowersStunnedBeforeAbility then
-                    status.Text = Medic()
+                    prints(Medic())
                     prints("Stunned count reached! using abi...")
                 end
             end
@@ -207,13 +201,11 @@ getgenv().TowerRemovedM = game:GetService("Workspace").Towers.ChildRemoved:Conne
             if t == v then
                 table.remove(Medics,i)
                 spawn(function()
-                    status.Text = "Medic Removed!"
-                    wait(1)
-                    status.Text = Medic()
+                    prints("Medic Removed!")
                 end)             
             end
         end
     end
 end)
-status.Text = Medic()
+prints(Medic())
 return AutoMedic
