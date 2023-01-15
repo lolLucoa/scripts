@@ -2594,7 +2594,7 @@ function ChangeWallpaper(WallpaperFileName)
 			local tween = TweenService:Create(Domain.Home.Wallpaper, transitionInfo, {ImageTransparency = 0.25})
 			tween:Play()
 		else
-			Notify("Couldn't locate file","We couldn't locate the file for use, make sure you add .png or .jpeg to the textbox",3944676352)
+			Notify("Couldn't locate file","We couldn't locate the file, make sure you add .png or .jpeg",3944676352)
 		end
 	end
 end
@@ -4372,7 +4372,7 @@ if CheckWritefile() then
 		Domain.Home.Music.ID.IDFrame.IDBox.Text = readfile(SongFileName)
 		PlaySound(true)
 	else
-		delfile(SongFileName)
+		writefile(SongFileName, "")
 	end
 end
 Domain.Home.Music.ID.IDFrame.IDBox.FocusLost:Connect(function()
@@ -4873,30 +4873,30 @@ end)
 
 
 function CheckTime()
-	if tonumber(GetDate():format("#h")) > 21 then
+	if tonumber(GetDate():format("#h")) > 20 then
 		Domain.Home.Welcome.Text = "Night, "..LocalPlayer.DisplayName
-	elseif tonumber(GetDate():format("#h")) > 19 then
+	elseif tonumber(GetDate():format("#h")) > 18 then
 		Domain.Home.Welcome.Text = "Evening, "..LocalPlayer.DisplayName
-	elseif tonumber(GetDate():format("#h")) > 13 then
+	elseif tonumber(GetDate():format("#h")) > 12 then
 		Domain.Home.Welcome.Text = "Afternoon, "..LocalPlayer.DisplayName
 	elseif tonumber(GetDate():format("#h")) == 12 then
 		Domain.Home.Welcome.Text = "It's high noon, "..LocalPlayer.DisplayName
-	elseif tonumber(GetDate():format("#h")) > 7 then
+	elseif tonumber(GetDate():format("#h")) > 6 then
 		Domain.Home.Welcome.Text = "Morning, "..LocalPlayer.DisplayName
 	else
 		Domain.Home.Welcome.Text = "Greetings, "..LocalPlayer.DisplayName
 	end
 	if tonumber(GetDate():format("#h")) == 0 then
 		Domain.Home.WelcomeSub.Text = "Remember to smile!"
-	elseif tonumber(GetDate():format("#h")) > 21 then
+	elseif tonumber(GetDate():format("#h")) > 20 then
 		Domain.Home.WelcomeSub.Text = "It's late... Rest early!"
-	elseif tonumber(GetDate():format("#h")) > 19 then
+	elseif tonumber(GetDate():format("#h")) > 18 then
 		Domain.Home.WelcomeSub.Text = "It's getting late.."
-	elseif tonumber(GetDate():format("#h")) > 13 then
+	elseif tonumber(GetDate():format("#h")) > 12 then
 		Domain.Home.WelcomeSub.Text = "Any plans this afternoon?"
 	elseif tonumber(GetDate():format("#h")) == 12 then
 		Domain.Home.WelcomeSub.Text = "Yeehaww!!"
-	elseif tonumber(GetDate():format("#h")) > 7 then
+	elseif tonumber(GetDate():format("#h")) > 6 then
 		Domain.Home.WelcomeSub.Text = "Rise and shine!"
 	else
 		Domain.Home.WelcomeSub.Text = "G-Go back to bed..."
