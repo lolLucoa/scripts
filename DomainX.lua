@@ -341,13 +341,6 @@ local DetectionScripts = {
 		Premium = false,
 		Loadstring = "https://raw.githubusercontent.com/DevPolarhub/ScriptPacks/main/Anime%20Destroyers%20Simulator",
 	},
-	towerdefensesim = {
-		Name = "Tower Defense Simulator",
-		Description = "This script is a community submitted script, we have no info on it",
-		Games = {3260590327},
-		Premium = false,
-		Loadstring = "https://pastebin.com/raw/Mjryt8Mm",
-	},
 	DemonSlayer = {
 		Name = "Demon Slayer RPG 2",
 		Description = "This script is a community submitted script, we have no info on it",
@@ -3900,7 +3893,7 @@ function ContinueBoot()
 		else -- folder existo
 			local LoadedCustomScripts = 0
 			for _, file in ipairs(listfiles(CustomFolderName)) do -- check files
-				local NewCustomScript = game:GetService("HttpService"):JSONDecode(readfile(file))
+				local NewCustomScript = game:GetService("HttpService"):JSONDecode(readfile(file)) --Make Name, Description, Games and Loadstring in json format
 				local NewTable = {
 					Name = NewCustomScript.Name,
 					Description =  NewCustomScript.Description,
