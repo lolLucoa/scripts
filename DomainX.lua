@@ -1,9 +1,4 @@
-
--- DomainX the most rushed and money making focused script available
--- now open source because we aren't money hungry
-
--- don't take this as a representation for how Sirius' source will look, not that you'll see that source anyway (as it's obfuscated)
--- we don't write code this bad anymore :thumbsup:
+--Domain X, edited by minttea#9260
 
 local Players = game:GetService("Players")
 while not game:GetService("Players").LocalPlayer do
@@ -133,7 +128,7 @@ local Init = function() end
 local MlemixMode = false
 
 
-local Release = 1.100
+local Release = 1.12
 local KeySystemEnabled = false
 local ReleaseType = "Release"
 local Public = true
@@ -200,7 +195,7 @@ local ToastStack = {}
 local UserIsPremium = true
 local UserIsPro = true
 local RotatingBar = false
-
+local SongFileName = "DomainX Audio.txt"
 
 local CachedUI = {}
 local cachedcoreguis = {}
@@ -4326,8 +4321,13 @@ function PlaySound()
 	MusicPlaying = true
 	local MusicSound = Instance.new("Sound",Domain)
 	MusicSound.Volume = 10
-	MusicSound.SoundId = getsynasset(Domain.Home.Music.ID.IDFrame.IDBox.Text)
 	CurrentMusicInfo = Domain.Home.Music.ID.IDFrame.IDBox.Text
+	if not isfile(CurrentMusicInfo) then
+		Notify("Couldn't locate file","We couldn't locate the file, make sure you add .mp3 and place the file in workspace",3944676352)
+	elseif CheckWritefile() then
+		writefile(SongFileName, CurrentMusicInfo)
+	end
+	MusicSound.SoundId = getsynasset(Domain.Home.Music.ID.IDFrame.IDBox.Text)
 	Domain.Home.Music.ID.IDFrame.IDBox.Text = ""
 	MusicSound.TimePosition = 0
 	MusicSound.Looped = true
@@ -4365,6 +4365,13 @@ Domain.Home.Music.Toggle.MouseButton1Click:Connect(function()
 end)
 
 Domain.Home.Music.ID.IDFrame.IDBox.PlaceholderText = "song.mp3"
+if CheckWritefile() then
+	if isfile(SongFileName) then
+		Domain.Home.Music.ID.IDFrame.IDBox.Text = readfile(SongFileName)
+	else
+		delfile(SongFileName)
+	end
+end
 Domain.Home.Music.ID.IDFrame.IDBox.FocusLost:Connect(function()
 	PlaySound()
 end)
@@ -4863,19 +4870,29 @@ end)
 
 
 function CheckTime()
-
-	if tonumber(GetDate():format("#h")) > 12 then
+	if tonumber(GetDate():format("#h")) > 21 then
+		Domain.Home.Welcome.Text = "Night, "..LocalPlayer.DisplayName
+	elseif tonumber(GetDate():format("#h")) > 19 then
 		Domain.Home.Welcome.Text = "Evening, "..LocalPlayer.DisplayName
-	else
+	elseif tonumber(GetDate():format("#h")) > 13 then
+		Domain.Home.Welcome.Text = "Afternoon, "..LocalPlayer.DisplayName
+	elseif tonumber(GetDate():format("#h")) > 7 then
 		Domain.Home.Welcome.Text = "Morning, "..LocalPlayer.DisplayName
+	else
+		Domain.Home.Welcome.Text = "Greetings, "..LocalPlayer.DisplayName
 	end
 	if tonumber(GetDate():format("#h")) == 0 then
 		Domain.Home.WelcomeSub.Text = "Remember to smile!"
-	elseif tonumber(GetDate():format("#h")) >= 1 then
-		Domain.Home.WelcomeSub.Text = "Up bright and early!"
-	end
-	if tonumber(GetDate():format("#h")) > 19 then
+	elseif tonumber(GetDate():format("#h")) > 21 then
+		Domain.Home.WelcomeSub.Text = "It's late... Rest early!"
+	elseif tonumber(GetDate():format("#h")) > 19 then
 		Domain.Home.WelcomeSub.Text = "It's getting late.."
+	elseif tonumber(GetDate():format("#h")) > 13 then
+		Domain.Home.WelcomeSub.Text = "Any plans this afternoon?"
+	elseif tonumber(GetDate():format("#h")) > 7 then
+		Domain.Home.WelcomeSub.Text = "Rise and shine!"
+	else
+		Domain.Home.WelcomeSub.Text = "G-Go back to bed..."
 	end
 end
 
