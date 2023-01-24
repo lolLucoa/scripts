@@ -28,6 +28,8 @@ end
 local function setStatus(v)
     if status then
         status.Text = v
+    else
+        prints(v)
     end
 end
 local function microTower(tower)
@@ -74,7 +76,7 @@ local function Medic1()
     end
     MedicIndex = (MedicIndex % #Medics) + 1
     local selectedMedic = Medics[MedicIndex]
-    if selectedMedic.Replicator:GetAttribute("Upgrade") < 5 thensetStatus
+    if selectedMedic.Replicator:GetAttribute("Upgrade") < 5 then 
         return "Waiting for lvl 5 medic..."
     elseif StunnedCount < 1 then
         return "Waiting for stun..."
@@ -153,7 +155,8 @@ local function monitorTower(tower)
                 prints("Stunned count reached! using abi...")
             end
         end
-        tower.Replicator.Stuns.Changed:Connect(function()
+        local stuns = tower.Replicator:WaitForChild("Stuns")
+        stuns.Changed:Connect(function()
             if checkStun(tower) then
                 StunnedCount = StunnedCount + 1 --detects stuns, requests medic ability
                 if StunnedCount >= TowersStunnedBeforeAbility then
