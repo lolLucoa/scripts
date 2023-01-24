@@ -29,7 +29,7 @@ local function setStatus(v)
     if status then
         status.Text = v
     else
-        prints(v)
+        warn(v)
     end
 end
 local function microTower(tower)
