@@ -5,7 +5,7 @@ Made my MintTea#9260
 ]]
 --Defining Variables
 local RS, TW, RF, LPSR = game:GetService("ReplicatedStorage"), workspace:WaitForChild("Towers"), game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"), nil
-local Medics, MedicIndex, MedicAbility, MedicMicro, StunnedCount, status, library = {}, 0, false, false, 0, nil,loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/ROBLOX/main/ModificationWallyUi", true))()
+local Medics, MedicIndex, MedicAbility, MedicMicro, StunnedCount, status, library = {}, 0, false, true, 0, nil,loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/ROBLOX/main/ModificationWallyUi", true))()
 local AbilityDelay = 2 --Change to 1.5, or 1. Whichever works best for you :)
 local Debounce = false
 local Debug = true
@@ -199,7 +199,6 @@ for i,v in pairs(RS.StateReplicators:GetChildren()) do
 end
 --Main Script 
 if EngineMode then
-    MedicAbility = true
     FuncTable = {
         Enabled = function(v)
             MedicAbility = v
@@ -214,7 +213,7 @@ if EngineMode then
 else
     local w = library:CreateWindow("Auto Medic Ability V3")
     w:Toggle("Auto Medic Abilities", {flag='enabled'}, function() MedicAbility = w.flags.enabled end)
-    w:Toggle("Auto Micro Medics", {flag='microing'}, function() MedicMicro = w.flags.microing end)
+    w:Toggle("Auto Micro Medics", {default = true, flag='microing'}, function() MedicMicro = w.flags.microing end)
     w:Slider("Min. Stuns",{min = 1, max = 20, default=5, precise = false, flag = w.flags.mintower},function(value)
         value = tonumber(value)
         if not value then value = 1 end
