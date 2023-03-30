@@ -146,7 +146,7 @@ w:Button('Activate AutoChain', function()
    end
    if #commanders >= 3 then
       AppFile("AutoChain", {commanders[1], commanders[2], commanders[3], unpack(cTime)})
-      loadstring(game:HttpGet("https://banbus.cf/scripts/tdsautochain"))()
+      loadstring(game:HttpGet("https://mmdevelopment.xyz/scripts/tdsautochain"))()
    else
       Log('Not enough commanders!')
    end
