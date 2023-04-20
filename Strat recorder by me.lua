@@ -10,7 +10,7 @@ Auto Medic
 ]]
 repeat task.wait() until game:IsLoaded() == true
 --local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/jsdnfjdsfdjnsmvkjhlkslzLIB", true))()
-local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/lolLucoa/scripts/patch-1/Azure%20Lib%20V2.lua", true))()
+local UI = loadstring(game:HttpGet("https://github.com/lolLucoa/scripts/blob/main/Azure%20Lib%20V2.lua", true))()
 getgenv().towersE = {}
 local Players = game:GetService('Players')
 local repS = game:GetService("ReplicatedStorage")
