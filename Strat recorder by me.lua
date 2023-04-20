@@ -10,7 +10,7 @@ Auto Medic
 ]]
 repeat task.wait() until game:IsLoaded() == true
 --local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/banbuskox/dfhtyxvzexrxgfdzgzfdvfdz/main/jsdnfjdsfdjnsmvkjhlkslzLIB", true))()
-local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/TacoCatBackWardsIsTacoCat/scripts/main/Azure%20Lib%20V2.lua", true))()
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/lolLucoa/scripts/patch-1/Azure%20Lib%20V2.lua", true))()
 getgenv().towersE = {}
 local Players = game:GetService('Players')
 local repS = game:GetService("ReplicatedStorage")
@@ -146,7 +146,7 @@ w:Button('Activate AutoChain', function()
    end
    if #commanders >= 3 then
       AppFile("AutoChain", {commanders[1], commanders[2], commanders[3], unpack(cTime)})
-      loadstring(game:HttpGet("https://banbus.cf/scripts/tdsautochain"))()
+      loadstring(game:HttpGet("https://mmdevelopment.xyz/scripts/tdsautochain"))()
    else
       Log('Not enough commanders!')
    end
